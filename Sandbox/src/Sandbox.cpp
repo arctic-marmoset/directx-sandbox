@@ -1,6 +1,21 @@
 #include "gspch.h"
 
+// CONSTANTS
+
+constexpr UINT kCanvasWidth = 1280;
+constexpr UINT kCanvasHeight = 720;
 constexpr LPCWSTR kWndClassName = L"WindowClass";
+
+// GLOBALS
+
+ID3D11Device *g_Device;
+ID3D11DeviceContext *g_Context;
+IDXGISwapChain *g_SwapChain;
+
+// FUNCTION DECLARATIONS
+
+void D3DInit(HWND windowHandle);
+void D3DShutdown();
 
 LRESULT CALLBACK WindowProc(HWND windowHandle,
                             UINT message,
@@ -25,19 +40,23 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     RegisterClassEx(&wc);
 
+    RECT wr = { 0, 0, kCanvasWidth, kCanvasHeight };
+    AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
+
     hWnd = CreateWindowEx(0,
                           kWndClassName,
                           L"DirectX Program",
                           WS_OVERLAPPEDWINDOW,
                           CW_USEDEFAULT,
                           CW_USEDEFAULT,
-                          CW_USEDEFAULT,
-                          CW_USEDEFAULT,
+                          wr.right - wr.left,
+                          wr.bottom - wr.top,
                           nullptr,
                           nullptr,
                           hInstance,
                           nullptr);
 
+    D3DInit(hWnd);
     ShowWindow(hWnd, nCmdShow);
 
     MSG msg = { };
@@ -51,6 +70,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
         }
     }
 
+    D3DShutdown();
     UnregisterClass(kWndClassName, hInstance);
 
     return static_cast<int>(msg.wParam);
@@ -71,4 +91,37 @@ LRESULT CALLBACK WindowProc(HWND hWnd,
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+void D3DInit(HWND windowHandle)
+{
+    DXGI_SWAP_CHAIN_DESC scd = { };
+    scd.BufferCount = 1;
+    scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    scd.OutputWindow = windowHandle;
+    scd.SampleDesc.Count = 4;
+    scd.Windowed = TRUE;
+
+    D3D11CreateDeviceAndSwapChain(nullptr,
+                                  D3D_DRIVER_TYPE_HARDWARE,
+                                  nullptr,
+                                  0,
+                                  nullptr,
+                                  0,
+                                  D3D11_SDK_VERSION,
+                                  &scd,
+                                  &g_SwapChain,
+                                  &g_Device,
+                                  nullptr,
+                                  &g_Context);
+}
+
+void D3DShutdown()
+{
+    g_Context->Flush();
+
+    g_SwapChain->Release();
+    g_Context->Release();
+    g_Device->Release();
 }
