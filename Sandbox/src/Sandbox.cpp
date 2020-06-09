@@ -49,7 +49,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = CreateSolidBrush(RGB(30, 30, 40));
     wc.lpszClassName = kWndClassName;
 
     RegisterClassEx(&wc);
@@ -116,10 +115,13 @@ void D3DInit(HWND windowHandle)
     DXGI_SWAP_CHAIN_DESC scd = { };
     scd.BufferCount = 1;
     scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    scd.BufferDesc.Width = kCanvasWidth;
+    scd.BufferDesc.Height = kCanvasHeight;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scd.OutputWindow = windowHandle;
     scd.SampleDesc.Count = 4;
     scd.Windowed = TRUE;
+    scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     D3D11CreateDeviceAndSwapChain(nullptr,
                                   D3D_DRIVER_TYPE_HARDWARE,
@@ -155,6 +157,8 @@ void D3DInit(HWND windowHandle)
 
 void D3DShutdown()
 {
+    g_SwapChain->SetFullscreenState(FALSE, NULL);
+
     g_Context->Flush();
 
     g_BackBuffer->Release();
