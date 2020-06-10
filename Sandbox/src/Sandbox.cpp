@@ -126,20 +126,21 @@ LRESULT CALLBACK WindowProc(HWND hWnd,
 void D3DInit(HWND windowHandle)
 {
     DXGI_SWAP_CHAIN_DESC scd = { };
-    scd.BufferCount = 1;
+    scd.BufferCount = 2;
     scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     scd.BufferDesc.Width = kCanvasWidth;
     scd.BufferDesc.Height = kCanvasHeight;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scd.OutputWindow = windowHandle;
-    scd.SampleDesc.Count = 4;
+    scd.SampleDesc.Count = 1;
     scd.Windowed = TRUE;
+    scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     D3D11CreateDeviceAndSwapChain(nullptr,
                                   D3D_DRIVER_TYPE_HARDWARE,
                                   nullptr,
-                                  0,
+                                  D3D11_CREATE_DEVICE_DEBUG,
                                   nullptr,
                                   0,
                                   D3D11_SDK_VERSION,
@@ -148,24 +149,6 @@ void D3DInit(HWND windowHandle)
                                   &g_Device,
                                   nullptr,
                                   &g_Context);
-
-    ID3D11Texture2D *pBackBuffer;
-    g_SwapChain->GetBuffer(0,
-                           __uuidof(ID3D11Texture2D),
-                           reinterpret_cast<LPVOID *>(&pBackBuffer));
-
-    g_Device->CreateRenderTargetView(pBackBuffer, nullptr, &g_BackBuffer);
-    g_Context->OMSetRenderTargets(1, &g_BackBuffer, nullptr);
-
-    D3D11_VIEWPORT viewport = { };
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.Width = kCanvasWidth;
-    viewport.Height = kCanvasHeight;
-
-    g_Context->RSSetViewports(1, &viewport);
-
-    pBackBuffer->Release();
 }
 
 void D3DShutdown()
@@ -182,6 +165,23 @@ void D3DShutdown()
 
 void DrawFrame()
 {
+    ID3D11Texture2D *pBackBuffer;
+    g_SwapChain->GetBuffer(0,
+                           __uuidof(ID3D11Texture2D),
+                           reinterpret_cast<LPVOID *>(&pBackBuffer));
+
+    g_Device->CreateRenderTargetView(pBackBuffer, nullptr, &g_BackBuffer);
+    pBackBuffer->Release();
+    g_Context->OMSetRenderTargets(1, &g_BackBuffer, nullptr);
+
+    D3D11_VIEWPORT viewport = { };
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = kCanvasWidth;
+    viewport.Height = kCanvasHeight;
+
+    g_Context->RSSetViewports(1, &viewport);
+
     constexpr ColorRGBA bg = { 0.15f, 0.2f, 0.4f, 1.0f };
     g_Context->ClearRenderTargetView(g_BackBuffer, bg.Raw);
 
