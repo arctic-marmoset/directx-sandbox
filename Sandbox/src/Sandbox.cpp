@@ -1,8 +1,15 @@
 #include "gspch.h"
 
 using namespace Microsoft;
+using namespace DirectX;
 
 // TYPE DEFINITIONS
+
+struct VERTEX2D
+{
+    XMFLOAT2 Position;
+    XMFLOAT3 Color;
+};
 
 union ColorRGBA
 {
@@ -26,12 +33,16 @@ WRL::ComPtr<ID3D11DeviceContext> g_Context;
 WRL::ComPtr<IDXGISwapChain> g_SwapChain;
 WRL::ComPtr<ID3D11RenderTargetView> g_BackBuffer;
 
+WRL::ComPtr<ID3D11VertexShader> g_VertexShader;
+WRL::ComPtr<ID3D11PixelShader> g_PixelShader;
+
 ColorRGBA g_Background = { 0.15f, 0.2f, 0.4f, 1.0f };
 float g_Increment = 0.0001f;
 
 // FUNCTION DECLARATIONS
 
 void D3DInit(HWND windowHandle);
+void InitPipeline();
 void D3DShutdown();
 
 void DrawFrame();
@@ -88,6 +99,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
                           nullptr);
 
     D3DInit(hWnd);
+    InitPipeline();
     ShowWindow(hWnd, nCmdShow);
 
     MSG msg = { };
@@ -172,11 +184,26 @@ void D3DInit(HWND windowHandle)
     g_Context->RSSetViewports(1, &viewport);
 }
 
-void D3DShutdown()
+void InitPipeline()
 {
-    g_SwapChain->SetFullscreenState(FALSE, NULL);
+    WRL::ComPtr<ID3DBlob> vsBlob;
+    WRL::ComPtr<ID3DBlob> psBlob;
 
-    g_Context->Flush();
+    D3DReadFileToBlob(L"Test_VS.cso", vsBlob.GetAddressOf());
+    D3DReadFileToBlob(L"Test_PS.cso", psBlob.GetAddressOf());
+
+    g_Device->CreateVertexShader(vsBlob->GetBufferPointer(),
+                                 vsBlob->GetBufferSize(),
+                                 nullptr,
+                                 g_VertexShader.GetAddressOf());
+
+    g_Device->CreatePixelShader(psBlob->GetBufferPointer(),
+                                psBlob->GetBufferSize(),
+                                nullptr,
+                                g_PixelShader.GetAddressOf());
+
+    g_Context->VSSetShader(g_VertexShader.Get(), nullptr, 0);
+    g_Context->PSSetShader(g_PixelShader.Get(), nullptr, 0);
 }
 
 void DrawFrame()
@@ -189,4 +216,11 @@ void DrawFrame()
     g_Background.Red += g_Increment;
 
     g_SwapChain->Present(0, 0);
+}
+
+void D3DShutdown()
+{
+    g_SwapChain->SetFullscreenState(FALSE, NULL);
+
+    g_Context->Flush();
 }

@@ -27,4 +27,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\Sandbox\Shaders\Test_VS.hlsl" />
+    <FxCompile Include="src\Sandbox\Shaders\Test_PS.hlsl" />
+  </ItemGroup>
 </Project>
