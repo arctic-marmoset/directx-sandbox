@@ -39,6 +39,19 @@ LRESULT CALLBACK WindowProc(HWND windowHandle,
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine,
+                   int nCmdShow);
+
+int main(int argc, char *argv[])
+{
+    return WinMain(GetModuleHandle(nullptr),
+                   nullptr,
+                   GetCommandLineA(),
+                   SW_SHOWDEFAULT);
+}
+
+int WINAPI WinMain(HINSTANCE hInstance,
+                   HINSTANCE hPrevInstance,
+                   LPSTR lpCmdLine,
                    int nCmdShow)
 {
     HWND hWnd = nullptr;
@@ -93,9 +106,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
     return static_cast<int>(msg.wParam);
 }
 
-LRESULT CALLBACK WindowProc(HWND hWnd, 
-                            UINT message, 
-                            WPARAM wParam, 
+LRESULT CALLBACK WindowProc(HWND hWnd,
+                            UINT message,
+                            WPARAM wParam,
                             LPARAM lParam)
 {
     switch (message)
