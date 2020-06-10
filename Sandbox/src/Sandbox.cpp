@@ -24,6 +24,9 @@ ID3D11DeviceContext *g_Context;
 IDXGISwapChain *g_SwapChain;
 ID3D11RenderTargetView *g_BackBuffer;
 
+ColorRGBA g_Background = { 0.15f, 0.2f, 0.4f, 1.0f };
+float g_Increment = 0.0001f;
+
 // FUNCTION DECLARATIONS
 
 void D3DInit(HWND windowHandle);
@@ -182,8 +185,12 @@ void DrawFrame()
 
     g_Context->RSSetViewports(1, &viewport);
 
-    constexpr ColorRGBA bg = { 0.15f, 0.2f, 0.4f, 1.0f };
-    g_Context->ClearRenderTargetView(g_BackBuffer, bg.Raw);
+    g_Context->ClearRenderTargetView(g_BackBuffer, g_Background.Raw);
+    if (g_Background.Red > 0.9f || g_Background.Red < 0.15f)
+    {
+        g_Increment = -g_Increment;
+    }
+    g_Background.Red += g_Increment;
 
     g_SwapChain->Present(0, 0);
 }
