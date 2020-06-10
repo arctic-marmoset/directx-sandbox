@@ -1,5 +1,7 @@
 #include "gspch.h"
 
+using namespace Microsoft;
+
 // TYPE DEFINITIONS
 
 union ColorRGBA
@@ -19,10 +21,10 @@ constexpr LPCWSTR kWndClassName = L"WindowClass";
 
 // GLOBALS
 
-ID3D11Device *g_Device;
-ID3D11DeviceContext *g_Context;
-IDXGISwapChain *g_SwapChain;
-ID3D11RenderTargetView *g_BackBuffer;
+WRL::ComPtr<ID3D11Device> g_Device;
+WRL::ComPtr<ID3D11DeviceContext> g_Context;
+WRL::ComPtr<IDXGISwapChain> g_SwapChain;
+WRL::ComPtr<ID3D11RenderTargetView> g_BackBuffer;
 
 ColorRGBA g_Background = { 0.15f, 0.2f, 0.4f, 1.0f };
 float g_Increment = 0.0001f;
@@ -148,18 +150,18 @@ void D3DInit(HWND windowHandle)
                                   0,
                                   D3D11_SDK_VERSION,
                                   &scd,
-                                  &g_SwapChain,
-                                  &g_Device,
+                                  g_SwapChain.GetAddressOf(),
+                                  g_Device.GetAddressOf(),
                                   nullptr,
-                                  &g_Context);
+                                  g_Context.GetAddressOf());
 
-    ID3D11Texture2D *pBackBuffer;
+    WRL::ComPtr<ID3D11Texture2D> pBackBuffer;
     g_SwapChain->GetBuffer(0,
                            __uuidof(ID3D11Texture2D),
-                           reinterpret_cast<LPVOID *>(&pBackBuffer));
+                           reinterpret_cast<LPVOID *>(pBackBuffer.GetAddressOf()));
 
-    g_Device->CreateRenderTargetView(pBackBuffer, nullptr, &g_BackBuffer);
-    g_Context->OMSetRenderTargets(1, &g_BackBuffer, nullptr);
+    g_Device->CreateRenderTargetView(pBackBuffer.Get(), nullptr, g_BackBuffer.GetAddressOf());
+    g_Context->OMSetRenderTargets(1, g_BackBuffer.GetAddressOf(), nullptr);
 
     D3D11_VIEWPORT viewport = { };
     viewport.TopLeftX = 0;
@@ -168,8 +170,6 @@ void D3DInit(HWND windowHandle)
     viewport.Height = kCanvasHeight;
 
     g_Context->RSSetViewports(1, &viewport);
-
-    pBackBuffer->Release();
 }
 
 void D3DShutdown()
@@ -177,16 +177,11 @@ void D3DShutdown()
     g_SwapChain->SetFullscreenState(FALSE, NULL);
 
     g_Context->Flush();
-
-    g_BackBuffer->Release();
-    g_SwapChain->Release();
-    g_Context->Release();
-    g_Device->Release();
 }
 
 void DrawFrame()
 {
-    g_Context->ClearRenderTargetView(g_BackBuffer, g_Background.Raw);
+    g_Context->ClearRenderTargetView(g_BackBuffer.Get(), g_Background.Raw);
     if (g_Background.Red > 0.9f || g_Background.Red < 0.15f)
     {
         g_Increment = -g_Increment;
