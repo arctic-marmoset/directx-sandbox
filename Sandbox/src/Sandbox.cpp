@@ -152,6 +152,24 @@ void D3DInit(HWND windowHandle)
                                   &g_Device,
                                   nullptr,
                                   &g_Context);
+
+    ID3D11Texture2D *pBackBuffer;
+    g_SwapChain->GetBuffer(0,
+                           __uuidof(ID3D11Texture2D),
+                           reinterpret_cast<LPVOID *>(&pBackBuffer));
+
+    g_Device->CreateRenderTargetView(pBackBuffer, nullptr, &g_BackBuffer);
+    g_Context->OMSetRenderTargets(1, &g_BackBuffer, nullptr);
+
+    D3D11_VIEWPORT viewport = { };
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = kCanvasWidth;
+    viewport.Height = kCanvasHeight;
+
+    g_Context->RSSetViewports(1, &viewport);
+
+    pBackBuffer->Release();
 }
 
 void D3DShutdown()
@@ -168,23 +186,6 @@ void D3DShutdown()
 
 void DrawFrame()
 {
-    ID3D11Texture2D *pBackBuffer;
-    g_SwapChain->GetBuffer(0,
-                           __uuidof(ID3D11Texture2D),
-                           reinterpret_cast<LPVOID *>(&pBackBuffer));
-
-    g_Device->CreateRenderTargetView(pBackBuffer, nullptr, &g_BackBuffer);
-    pBackBuffer->Release();
-    g_Context->OMSetRenderTargets(1, &g_BackBuffer, nullptr);
-
-    D3D11_VIEWPORT viewport = { };
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.Width = kCanvasWidth;
-    viewport.Height = kCanvasHeight;
-
-    g_Context->RSSetViewports(1, &viewport);
-
     g_Context->ClearRenderTargetView(g_BackBuffer, g_Background.Raw);
     if (g_Background.Red > 0.9f || g_Background.Red < 0.15f)
     {
