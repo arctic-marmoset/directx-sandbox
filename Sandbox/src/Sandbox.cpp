@@ -31,7 +31,7 @@ constexpr LPCWSTR kWndClassName = L"WindowClass";
 WRL::ComPtr<ID3D11Device> g_Device;
 WRL::ComPtr<ID3D11DeviceContext> g_Context;
 WRL::ComPtr<IDXGISwapChain> g_SwapChain;
-WRL::ComPtr<ID3D11RenderTargetView> g_BackBuffer;
+WRL::ComPtr<ID3D11RenderTargetView> g_TargetView;
 
 WRL::ComPtr<ID3D11VertexShader> g_VertexShader;
 WRL::ComPtr<ID3D11PixelShader> g_PixelShader;
@@ -139,7 +139,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd,
             if (g_SwapChain)
             {
                 g_Context->OMSetRenderTargets(0, nullptr, nullptr);
-                g_BackBuffer->Release();
+                g_TargetView->Release();
                 g_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 
                 const auto width = LOWORD(lParam);
@@ -197,7 +197,7 @@ void InitBuffers()
 
     g_Device->CreateRenderTargetView(pBackBuffer.Get(),
                                      nullptr,
-                                     g_BackBuffer.GetAddressOf());
+                                     g_TargetView.GetAddressOf());
 }
 
 void InitViewport(FLOAT width, FLOAT height)
@@ -235,9 +235,9 @@ void InitPipeline()
 
 void DrawFrame()
 {
-    g_Context->OMSetRenderTargets(1, g_BackBuffer.GetAddressOf(), nullptr);
+    g_Context->OMSetRenderTargets(1, g_TargetView.GetAddressOf(), nullptr);
 
-    g_Context->ClearRenderTargetView(g_BackBuffer.Get(), g_Background.Raw);
+    g_Context->ClearRenderTargetView(g_TargetView.Get(), g_Background.Raw);
     if (g_Background.Red > 0.9f || g_Background.Red < 0.15f)
     {
         g_Increment = -g_Increment;
