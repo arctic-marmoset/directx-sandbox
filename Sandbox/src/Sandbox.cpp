@@ -37,6 +37,7 @@ WRL::ComPtr<ID3D11VertexShader> g_VertexShader;
 WRL::ComPtr<ID3D11PixelShader> g_PixelShader;
 
 WRL::ComPtr<ID3D11InputLayout> g_InputLayout;
+WRL::ComPtr<ID3D11Buffer> g_VertexBuffer;
 
 ColorRGBA g_Background = { 0.15f, 0.2f, 0.4f, 1.0f };
 float g_Increment = 0.0001f;
@@ -47,6 +48,7 @@ void D3DInit(HWND windowHandle);
 void InitBuffers();
 void InitViewport(FLOAT width, FLOAT height);
 void InitPipeline();
+void InitResources();
 void D3DShutdown();
 
 void DrawFrame();
@@ -106,6 +108,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     InitBuffers();
     InitViewport(kCanvasWidth, kCanvasHeight);
     InitPipeline();
+    InitResources();
     ShowWindow(hWnd, nCmdShow);
 
     MSG msg = { };
@@ -265,6 +268,29 @@ void InitPipeline()
     g_Context->IASetInputLayout(g_InputLayout.Get());
 }
 
+void InitResources()
+{
+    VERTEX2D triangle[] =
+    {
+        { XMFLOAT2( 0.0f,  0.5f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+        { XMFLOAT2( 0.5f, -0.5f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT2(-0.5f, -0.5f), XMFLOAT3(0.0f, 0.0f, 1.0f) }
+    };
+
+    D3D11_BUFFER_DESC bd = { };
+    bd.Usage = D3D11_USAGE_DYNAMIC;
+    bd.ByteWidth = sizeof(triangle);
+    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    g_Device->CreateBuffer(&bd, nullptr, &g_VertexBuffer);
+
+    D3D11_MAPPED_SUBRESOURCE msr = { };
+    g_Context->Map(g_VertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+    memcpy(msr.pData, triangle, sizeof(triangle));
+    g_Context->Unmap(g_VertexBuffer.Get(), 0);
+}
+
 void DrawFrame()
 {
     g_Context->OMSetRenderTargets(1, g_TargetView.GetAddressOf(), nullptr);
@@ -276,6 +302,18 @@ void DrawFrame()
     }
     g_Background.Red += g_Increment;
 
+    const UINT stride = sizeof(VERTEX2D);
+    const UINT offset = 0;
+
+    g_Context->IASetVertexBuffers(0,
+                                  1,
+                                  g_VertexBuffer.GetAddressOf(),
+                                  &stride,
+                                  &offset);
+
+    g_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    g_Context->Draw(3, 0);
     g_SwapChain->Present(0, 0);
 }
 
