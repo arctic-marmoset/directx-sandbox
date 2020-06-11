@@ -162,17 +162,20 @@ void D3DInit(HWND windowHandle)
                                   0,
                                   D3D11_SDK_VERSION,
                                   &scd,
-                                  g_SwapChain.GetAddressOf(),
-                                  g_Device.GetAddressOf(),
+                                  &g_SwapChain,
+                                  &g_Device,
                                   nullptr,
-                                  g_Context.GetAddressOf());
+                                  &g_Context);
 
     WRL::ComPtr<ID3D11Texture2D> pBackBuffer;
     g_SwapChain->GetBuffer(0,
                            __uuidof(ID3D11Texture2D),
-                           reinterpret_cast<LPVOID *>(pBackBuffer.GetAddressOf()));
+                           &pBackBuffer);
 
-    g_Device->CreateRenderTargetView(pBackBuffer.Get(), nullptr, g_BackBuffer.GetAddressOf());
+    g_Device->CreateRenderTargetView(pBackBuffer.Get(),
+                                     nullptr,
+                                     &g_BackBuffer);
+
     g_Context->OMSetRenderTargets(1, g_BackBuffer.GetAddressOf(), nullptr);
 
     D3D11_VIEWPORT viewport = { };
@@ -189,18 +192,18 @@ void InitPipeline()
     WRL::ComPtr<ID3DBlob> vsBlob;
     WRL::ComPtr<ID3DBlob> psBlob;
 
-    D3DReadFileToBlob(L"Test_VS.cso", vsBlob.GetAddressOf());
-    D3DReadFileToBlob(L"Test_PS.cso", psBlob.GetAddressOf());
+    D3DReadFileToBlob(L"Test_VS.cso", &vsBlob);
+    D3DReadFileToBlob(L"Test_PS.cso", &psBlob);
 
     g_Device->CreateVertexShader(vsBlob->GetBufferPointer(),
                                  vsBlob->GetBufferSize(),
                                  nullptr,
-                                 g_VertexShader.GetAddressOf());
+                                 &g_VertexShader);
 
     g_Device->CreatePixelShader(psBlob->GetBufferPointer(),
                                 psBlob->GetBufferSize(),
                                 nullptr,
-                                g_PixelShader.GetAddressOf());
+                                &g_PixelShader);
 
     g_Context->VSSetShader(g_VertexShader.Get(), nullptr, 0);
     g_Context->PSSetShader(g_PixelShader.Get(), nullptr, 0);
