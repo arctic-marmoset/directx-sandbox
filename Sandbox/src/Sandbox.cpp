@@ -42,6 +42,8 @@ float g_Increment = 0.0001f;
 // FUNCTION DECLARATIONS
 
 void D3DInit(HWND windowHandle);
+void InitBuffers();
+void InitViewport(FLOAT width, FLOAT height);
 void InitPipeline();
 void D3DShutdown();
 
@@ -99,6 +101,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
                           nullptr);
 
     D3DInit(hWnd);
+    InitBuffers();
+    InitViewport(kCanvasWidth, kCanvasHeight);
     InitPipeline();
     ShowWindow(hWnd, nCmdShow);
 
@@ -130,6 +134,22 @@ LRESULT CALLBACK WindowProc(HWND hWnd,
 {
     switch (message)
     {
+    case WM_SIZE:
+        {
+            if (g_SwapChain)
+            {
+                g_Context->OMSetRenderTargets(0, nullptr, nullptr);
+                g_BackBuffer->Release();
+                g_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+
+                const auto width = LOWORD(lParam);
+                const auto height = HIWORD(lParam);
+
+                InitBuffers();
+                InitViewport(width, height);
+            }
+            return 1;
+        }
     case WM_DESTROY:
         {
             PostQuitMessage(0);
@@ -166,7 +186,10 @@ void D3DInit(HWND windowHandle)
                                   &g_Device,
                                   nullptr,
                                   &g_Context);
+}
 
+void InitBuffers()
+{
     WRL::ComPtr<ID3D11Texture2D> pBackBuffer;
     g_SwapChain->GetBuffer(0,
                            __uuidof(ID3D11Texture2D),
@@ -174,13 +197,16 @@ void D3DInit(HWND windowHandle)
 
     g_Device->CreateRenderTargetView(pBackBuffer.Get(),
                                      nullptr,
-                                     &g_BackBuffer);
+                                     g_BackBuffer.GetAddressOf());
+}
 
+void InitViewport(FLOAT width, FLOAT height)
+{
     D3D11_VIEWPORT viewport = { };
     viewport.TopLeftX = 0;
     viewport.TopLeftY = 0;
-    viewport.Width = kCanvasWidth;
-    viewport.Height = kCanvasHeight;
+    viewport.Width = width;
+    viewport.Height = height;
 
     g_Context->RSSetViewports(1, &viewport);
 }
