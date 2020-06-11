@@ -176,8 +176,6 @@ void D3DInit(HWND windowHandle)
                                      nullptr,
                                      &g_BackBuffer);
 
-    g_Context->OMSetRenderTargets(1, g_BackBuffer.GetAddressOf(), nullptr);
-
     D3D11_VIEWPORT viewport = { };
     viewport.TopLeftX = 0;
     viewport.TopLeftY = 0;
@@ -211,6 +209,8 @@ void InitPipeline()
 
 void DrawFrame()
 {
+    g_Context->OMSetRenderTargets(1, g_BackBuffer.GetAddressOf(), nullptr);
+
     g_Context->ClearRenderTargetView(g_BackBuffer.Get(), g_Background.Raw);
     if (g_Background.Red > 0.9f || g_Background.Red < 0.15f)
     {
