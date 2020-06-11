@@ -36,6 +36,8 @@ WRL::ComPtr<ID3D11RenderTargetView> g_TargetView;
 WRL::ComPtr<ID3D11VertexShader> g_VertexShader;
 WRL::ComPtr<ID3D11PixelShader> g_PixelShader;
 
+WRL::ComPtr<ID3D11InputLayout> g_InputLayout;
+
 ColorRGBA g_Background = { 0.15f, 0.2f, 0.4f, 1.0f };
 float g_Increment = 0.0001f;
 
@@ -231,6 +233,36 @@ void InitPipeline()
 
     g_Context->VSSetShader(g_VertexShader.Get(), nullptr, 0);
     g_Context->PSSetShader(g_PixelShader.Get(), nullptr, 0);
+
+    D3D11_INPUT_ELEMENT_DESC ied[] =
+    {
+        {
+            "POSITION",
+            0,
+            DXGI_FORMAT_R32G32_FLOAT,
+            0,
+            0,
+            D3D11_INPUT_PER_VERTEX_DATA,
+            0
+        },
+        {
+            "COLOR",
+            0,
+            DXGI_FORMAT_R32G32B32_FLOAT,
+            0,
+            D3D11_APPEND_ALIGNED_ELEMENT,
+            D3D11_INPUT_PER_VERTEX_DATA,
+            0
+        }
+    };
+
+    g_Device->CreateInputLayout(ied,
+                                2,
+                                vsBlob->GetBufferPointer(),
+                                vsBlob->GetBufferSize(),
+                                &g_InputLayout);
+
+    g_Context->IASetInputLayout(g_InputLayout.Get());
 }
 
 void DrawFrame()
