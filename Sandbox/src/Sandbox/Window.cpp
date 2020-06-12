@@ -1,16 +1,18 @@
 #include "gspch.h"
 #include "Window.h"
 
-Window::Window(unsigned int width, unsigned int height)
+Window::Window(const Properties &props) 
+    :
+    m_Data(props)
 {
-    RECT wr = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+    RECT wr = { 0, 0, static_cast<LONG>(m_Data.Width), static_cast<LONG>(m_Data.Height) };
     ::AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
     wr = { 0, 0, wr.right - wr.left, wr.bottom - wr.top };
 
-    Create(nullptr, &wr, L"DirectX Program", WS_OVERLAPPEDWINDOW);
+    Create(nullptr, &wr, m_Data.Title.c_str(), WS_OVERLAPPEDWINDOW);
 
     m_Graphics = std::make_unique<DX11::Graphics>(m_hWnd);
-    m_Graphics->SetViewport(width, height);
+    m_Graphics->SetViewport(m_Data.Width, m_Data.Height);
 }
 
 void Window::OnUpdate()

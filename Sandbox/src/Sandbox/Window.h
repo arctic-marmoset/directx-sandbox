@@ -7,6 +7,24 @@ using WindowTraits = CWinTraits<WS_OVERLAPPEDWINDOW>;
 class Window final : public CWindowImpl<Window, CWindow, WindowTraits>
 {
 public:
+    struct Properties
+    {
+        unsigned int Width;
+        unsigned int Height;
+        std::wstring Title;
+
+        Properties(unsigned int width = 1280,
+                   unsigned int height = 720,
+                   const std::wstring &title = L"DirectX Program")
+            :
+            Width(width),
+            Height(height),
+            Title(title)
+        {
+        }
+    };
+
+public:
     // Passing -1 as background param to get (HBRUSH)0
     DECLARE_WND_CLASS_EX2(L"WindowClass", Window, CS_OWNDC, -1)
 
@@ -15,7 +33,7 @@ public:
         MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
     END_MSG_MAP()
 
-    Window(unsigned int width, unsigned int height);
+    Window(const Properties &props = Properties());
     Window(const Window &) = delete;
 
     void OnUpdate();
@@ -29,5 +47,6 @@ public:
     static bool ProcessMessages();
 
 private:
+    Properties m_Data;
     std::unique_ptr<DX11::Graphics> m_Graphics;
 };
