@@ -1,4 +1,5 @@
 #include "gspch.h"
+#include "Sandbox/Window.h"
 
 using namespace Microsoft;
 using namespace DirectX;
@@ -24,7 +25,6 @@ union ColorRGBA
 
 constexpr UINT kCanvasWidth = 1280;
 constexpr UINT kCanvasHeight = 720;
-constexpr LPCWSTR kWndClassName = L"WindowClass";
 
 // GLOBALS
 
@@ -53,63 +53,17 @@ void D3DShutdown();
 
 void DrawFrame();
 
-LRESULT CALLBACK WindowProc(HWND windowHandle,
-                            UINT message,
-                            WPARAM wParam,
-                            LPARAM lParam);
-
-int WINAPI WinMain(HINSTANCE hInstance,
-                   HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine,
-                   int nCmdShow);
-
 int main(int argc, char *argv[])
 {
-    return WinMain(GetModuleHandle(nullptr),
-                   nullptr,
-                   GetCommandLineA(),
-                   SW_SHOWDEFAULT);
-}
+    Window window(kCanvasWidth, kCanvasHeight);
 
-int WINAPI WinMain(HINSTANCE hInstance,
-                   HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine,
-                   int nCmdShow)
-{
-    HWND hWnd = nullptr;
-
-    WNDCLASSEX wc = { };
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.lpszClassName = kWndClassName;
-
-    RegisterClassEx(&wc);
-
-    RECT wr = { 0, 0, kCanvasWidth, kCanvasHeight };
-    AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
-
-    hWnd = CreateWindowEx(0,
-                          kWndClassName,
-                          L"DirectX Program",
-                          WS_OVERLAPPEDWINDOW,
-                          CW_USEDEFAULT,
-                          CW_USEDEFAULT,
-                          wr.right - wr.left,
-                          wr.bottom - wr.top,
-                          nullptr,
-                          nullptr,
-                          hInstance,
-                          nullptr);
-
-    D3DInit(hWnd);
+    D3DInit(window);
     InitBuffers();
     InitViewport(kCanvasWidth, kCanvasHeight);
     InitPipeline();
     InitResources();
-    ShowWindow(hWnd, nCmdShow);
+
+    window.ShowWindow(SW_SHOWDEFAULT);
 
     MSG msg = { };
 
@@ -127,42 +81,29 @@ int WINAPI WinMain(HINSTANCE hInstance,
     }
 
     D3DShutdown();
-    UnregisterClass(kWndClassName, hInstance);
 
     return static_cast<int>(msg.wParam);
 }
 
-LRESULT CALLBACK WindowProc(HWND hWnd,
-                            UINT message,
-                            WPARAM wParam,
-                            LPARAM lParam)
+// TODO: Move into Window class as Message Handler
+LRESULT CALLBACK OnResize(UINT hMsg,
+                          WPARAM wParam,
+                          LPARAM lParam,
+                          BOOL &bHandled)
 {
-    switch (message)
+    if (g_SwapChain)
     {
-    case WM_SIZE:
-        {
-            if (g_SwapChain)
-            {
-                g_Context->OMSetRenderTargets(0, nullptr, nullptr);
-                g_TargetView->Release();
-                g_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+        g_Context->OMSetRenderTargets(0, nullptr, nullptr);
+        g_TargetView->Release();
+        g_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 
-                const auto width = LOWORD(lParam);
-                const auto height = HIWORD(lParam);
+        const auto width = LOWORD(lParam);
+        const auto height = HIWORD(lParam);
 
-                InitBuffers();
-                InitViewport(width, height);
-            }
-            return 1;
-        }
-    case WM_DESTROY:
-        {
-            PostQuitMessage(0);
-            return 0;
-        }
+        InitBuffers();
+        InitViewport(width, height);
     }
-
-    return DefWindowProc(hWnd, message, wParam, lParam);
+    return 1;
 }
 
 void D3DInit(HWND windowHandle)

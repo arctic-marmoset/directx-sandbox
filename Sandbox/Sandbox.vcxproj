@@ -104,9 +104,11 @@
   <ItemGroup>
     <ClCompile Include="src\gspch.cpp" />
     <ClCompile Include="src\Sandbox.cpp" />
+    <ClCompile Include="src\Sandbox\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gspch.h" />
+    <ClInclude Include="src\Sandbox\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Sandbox\Shaders\Test_PS.hlsl">
