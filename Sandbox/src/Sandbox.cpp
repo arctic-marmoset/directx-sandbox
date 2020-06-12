@@ -261,6 +261,4 @@ void DrawFrame()
 void D3DShutdown()
 {
     g_SwapChain->SetFullscreenState(FALSE, NULL);
-
-    g_Context->Flush();
 }
