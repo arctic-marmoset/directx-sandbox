@@ -50,6 +50,19 @@ namespace DX11
         m_SwapChain->SetFullscreenState(FALSE, nullptr);
     }
 
+    void Graphics::OnResize(float width, float height)
+    {
+        if (m_SwapChain)
+        {
+            m_Context->OMSetRenderTargets(0, nullptr, nullptr);
+            m_Target->Release();
+            m_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+
+            InitBackBuffer();
+            SetViewport(width, height);
+        }
+    }
+
     void Graphics::InitBackBuffer()
     {
         wrl::ComPtr<ID3D11Texture2D> pBackBuffer;

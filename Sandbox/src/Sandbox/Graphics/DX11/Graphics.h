@@ -10,6 +10,8 @@ namespace DX11
         Graphics(const Graphics &) = delete;
         ~Graphics();
 
+        void OnResize(float width, float height);
+
         void SetViewport(float width, float height);
         
         void InitBackBuffer();
