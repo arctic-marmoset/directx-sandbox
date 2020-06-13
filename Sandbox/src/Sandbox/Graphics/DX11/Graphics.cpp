@@ -157,7 +157,7 @@ namespace DX11
 
         m_Context->IASetInputLayout(inputLayout.Get());
 
-        // Define resources
+        // Define vertex resources
 
         struct VERTEX2D
         {
@@ -174,18 +174,18 @@ namespace DX11
 
         // Initialise Vertex Buffer
 
-        D3D11_BUFFER_DESC bd = { };
-        bd.Usage = D3D11_USAGE_DYNAMIC;
-        bd.ByteWidth = sizeof(triangle);
-        bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        D3D11_BUFFER_DESC vbd = { };
+        vbd.Usage = D3D11_USAGE_DYNAMIC;
+        vbd.ByteWidth = sizeof(triangle);
+        vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        vbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
         wrl::ComPtr<ID3D11Buffer> vertexBuffer;
-        m_Device->CreateBuffer(&bd, nullptr, &vertexBuffer);
+        m_Device->CreateBuffer(&vbd, nullptr, &vertexBuffer);
 
-        D3D11_MAPPED_SUBRESOURCE msr = { };
-        m_Context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
-        memcpy(msr.pData, triangle, sizeof(triangle));
+        D3D11_MAPPED_SUBRESOURCE vmsr = { };
+        m_Context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &vmsr);
+        memcpy(vmsr.pData, triangle, sizeof(triangle));
         m_Context->Unmap(vertexBuffer.Get(), 0);
 
         // Bind Vertex Buffer to IA stage
@@ -199,13 +199,38 @@ namespace DX11
                                       &stride,
                                       &offset);
 
+        // Define indices
+
+        const unsigned short indices[] = { 0, 1, 2 };
+
+        // Initialise Index Buffer
+
+        D3D11_BUFFER_DESC ibd = { };
+        ibd.Usage = D3D11_USAGE_DYNAMIC;
+        ibd.ByteWidth = sizeof(indices);
+        ibd.StructureByteStride = sizeof(unsigned short);
+        ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        ibd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+        wrl::ComPtr<ID3D11Buffer> indexBuffer;
+        m_Device->CreateBuffer(&ibd, nullptr, &indexBuffer);
+
+        D3D11_MAPPED_SUBRESOURCE imsr = { };
+        m_Context->Map(indexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &imsr);
+        memcpy(imsr.pData, indices, sizeof(indices));
+        m_Context->Unmap(indexBuffer.Get(), 0);
+
+        // Bind Index Buffer to IA stage
+
+        m_Context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+
         // Describe topology
 
         m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         // Finally
 
-        m_Context->Draw(3, 0);
+        m_Context->DrawIndexed(static_cast<UINT>(std::size(indices)), 0, 0);
     }
 
 }
