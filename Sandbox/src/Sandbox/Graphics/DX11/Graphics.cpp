@@ -224,6 +224,41 @@ namespace DX11
 
         m_Context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
+        // Define constant buffer
+
+        struct ConstBuffer
+        {
+            dx::XMMATRIX Transform;
+        };
+
+        UINT vpCount = 1;
+        D3D11_VIEWPORT vp = { };
+        m_Context->RSGetViewports(&vpCount, &vp);
+
+        const ConstBuffer cb = 
+        { 
+            dx::XMMatrixTranspose(dx::XMMatrixScaling(vp.Height / vp.Width, 1.0f, 1.0f))
+        };
+
+        // Initialise Constant Buffer
+
+        D3D11_BUFFER_DESC cbd = { };
+        cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        cbd.Usage = D3D11_USAGE_DYNAMIC;
+        cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        cbd.ByteWidth = sizeof(cb);
+        cbd.StructureByteStride = 0;
+
+        D3D11_SUBRESOURCE_DATA csd = { };
+        csd.pSysMem = &cb;
+
+        wrl::ComPtr<ID3D11Buffer> constantBuffer;
+        m_Device->CreateBuffer(&cbd, &csd, &constantBuffer);
+
+        // Bind Constant Buffer to VS stage
+
+        m_Context->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+
         // Describe topology
 
         m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

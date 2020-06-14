@@ -10,10 +10,15 @@ struct VS_OUTPUT
     float4 Color : COLOR;
 };
 
+cbuffer ConstBuffer
+{
+    matrix Transform;
+};
+
 VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.Pos = float4(input.Pos, 0.0f, 1.0f);
+    output.Pos = mul(float4(input.Pos, 0.0f, 1.0f), Transform);
     output.Color = float4(input.Color, 1.0f);
     return output;
 }
