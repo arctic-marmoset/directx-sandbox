@@ -20,7 +20,7 @@ void Window::OnUpdate()
 {
     m_Graphics->BeginFrame();
     m_Graphics->ClearBackBuffer(0.1f, 0.2f, 0.4f);
-    m_Graphics->DrawTriangle();
+    m_Graphics->DrawCube();
     m_Graphics->EndFrame();
 }
 

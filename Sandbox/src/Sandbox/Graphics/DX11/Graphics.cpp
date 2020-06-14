@@ -3,11 +3,14 @@
 
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
+namespace chr = std::chrono;
 
 namespace DX11
 {
 
     Graphics::Graphics(HWND windowHandle)
+        :
+        m_TimeLast(chr::steady_clock::now())
     {
         InitDeviceAndSwapChain(windowHandle);
         InitBackBuffer();
@@ -77,7 +80,11 @@ namespace DX11
 
     void Graphics::SetViewport(float width, float height)
     {
-        D3D11_VIEWPORT viewport = { 0, 0, width, height };
+        D3D11_VIEWPORT viewport = { };
+        viewport.Width = width;
+        viewport.Height = height;
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
         m_Context->RSSetViewports(1, &viewport);
     }
 
@@ -97,7 +104,7 @@ namespace DX11
         m_SwapChain->Present(0, 0);
     }
 
-    void Graphics::DrawTriangle()
+    void Graphics::DrawCube()
     {
         // Initialise shaders
 
@@ -130,7 +137,7 @@ namespace DX11
             {
                 "POSITION",
                 0,
-                DXGI_FORMAT_R32G32_FLOAT,
+                DXGI_FORMAT_R32G32B32_FLOAT,
                 0,
                 0,
                 D3D11_INPUT_PER_VERTEX_DATA,
@@ -150,7 +157,7 @@ namespace DX11
         wrl::ComPtr<ID3D11InputLayout> inputLayout;
 
         m_Device->CreateInputLayout(ied,
-                                    2,
+                                    static_cast<UINT>(std::size(ied)),
                                     vsBlob->GetBufferPointer(),
                                     vsBlob->GetBufferSize(),
                                     &inputLayout);
@@ -159,38 +166,41 @@ namespace DX11
 
         // Define vertex resources
 
-        struct VERTEX2D
+        struct VERTEX3D
         {
-            dx::XMFLOAT2 Pos;
+            dx::XMFLOAT3 Pos;
             dx::XMFLOAT3 Color;
         };
 
-        VERTEX2D triangle[] =
+        VERTEX3D cube[] =
         {
-            { dx::XMFLOAT2( 0.0f,  0.5f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { dx::XMFLOAT2( 0.5f, -0.5f), dx::XMFLOAT3(0.0f, 1.0f, 0.0f) },
-            { dx::XMFLOAT2(-0.5f, -0.5f), dx::XMFLOAT3(0.0f, 0.0f, 1.0f) }
+            { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
         };
 
         // Initialise Vertex Buffer
 
         D3D11_BUFFER_DESC vbd = { };
-        vbd.Usage = D3D11_USAGE_DYNAMIC;
-        vbd.ByteWidth = sizeof(triangle);
+        vbd.Usage = D3D11_USAGE_DEFAULT;
         vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        vbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        vbd.ByteWidth = sizeof(cube);
+        vbd.StructureByteStride = sizeof(VERTEX3D);
+
+        D3D11_SUBRESOURCE_DATA vsrd = { };
+        vsrd.pSysMem = cube;
 
         wrl::ComPtr<ID3D11Buffer> vertexBuffer;
-        m_Device->CreateBuffer(&vbd, nullptr, &vertexBuffer);
-
-        D3D11_MAPPED_SUBRESOURCE vmsr = { };
-        m_Context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &vmsr);
-        memcpy(vmsr.pData, triangle, sizeof(triangle));
-        m_Context->Unmap(vertexBuffer.Get(), 0);
+        m_Device->CreateBuffer(&vbd, &vsrd, &vertexBuffer);
 
         // Bind Vertex Buffer to IA stage
 
-        const UINT stride = sizeof(VERTEX2D);
+        const UINT stride = sizeof(VERTEX3D);
         const UINT offset = 0;
 
         m_Context->IASetVertexBuffers(0,
@@ -201,24 +211,29 @@ namespace DX11
 
         // Define indices
 
-        const unsigned short indices[] = { 0, 1, 2 };
+        const unsigned short indices[] = 
+        { 
+            0, 4, 1,   5, 1, 4,
+            0, 1, 2,   3, 2, 1,
+            0, 2, 4,   6, 4, 2,
+            1, 5, 3,   7, 3, 5,
+            3, 7, 2,   6, 2, 7,
+            4, 6, 5,   7, 5, 6,
+        };
 
         // Initialise Index Buffer
 
         D3D11_BUFFER_DESC ibd = { };
-        ibd.Usage = D3D11_USAGE_DYNAMIC;
+        ibd.Usage = D3D11_USAGE_DEFAULT;
+        ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
         ibd.ByteWidth = sizeof(indices);
         ibd.StructureByteStride = sizeof(unsigned short);
-        ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        ibd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+        D3D11_SUBRESOURCE_DATA isrd = { };
+        isrd.pSysMem = indices;
 
         wrl::ComPtr<ID3D11Buffer> indexBuffer;
-        m_Device->CreateBuffer(&ibd, nullptr, &indexBuffer);
-
-        D3D11_MAPPED_SUBRESOURCE imsr = { };
-        m_Context->Map(indexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &imsr);
-        memcpy(imsr.pData, indices, sizeof(indices));
-        m_Context->Unmap(indexBuffer.Get(), 0);
+        m_Device->CreateBuffer(&ibd, &isrd, &indexBuffer);
 
         // Bind Index Buffer to IA stage
 
@@ -235,25 +250,29 @@ namespace DX11
         D3D11_VIEWPORT vp = { };
         m_Context->RSGetViewports(&vpCount, &vp);
 
-        const ConstBuffer cb = 
-        { 
-            dx::XMMatrixTranspose(dx::XMMatrixScaling(vp.Height / vp.Width, 1.0f, 1.0f))
+        float step = chr::duration<float>(chr::steady_clock::now() - m_TimeLast).count();
+
+        const ConstBuffer cb =
+        {
+            dx::XMMatrixTranspose(dx::XMMatrixRotationX(step / 4.0f) *
+                                  dx::XMMatrixRotationY(step) *
+                                  dx::XMMatrixTranslation(0.0f, 0.0f, 4.0f) * 
+                                  dx::XMMatrixPerspectiveLH(1.0f, vp.Height / vp.Width, 0.5f, 10.0f))
         };
 
         // Initialise Constant Buffer
 
         D3D11_BUFFER_DESC cbd = { };
+        cbd.Usage = D3D11_USAGE_DEFAULT;
         cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        cbd.Usage = D3D11_USAGE_DYNAMIC;
-        cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         cbd.ByteWidth = sizeof(cb);
         cbd.StructureByteStride = 0;
 
-        D3D11_SUBRESOURCE_DATA csd = { };
-        csd.pSysMem = &cb;
+        D3D11_SUBRESOURCE_DATA csrd = { };
+        csrd.pSysMem = &cb;
 
         wrl::ComPtr<ID3D11Buffer> constantBuffer;
-        m_Device->CreateBuffer(&cbd, &csd, &constantBuffer);
+        m_Device->CreateBuffer(&cbd, &csrd, &constantBuffer);
 
         // Bind Constant Buffer to VS stage
 
