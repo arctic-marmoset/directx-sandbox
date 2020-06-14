@@ -9,12 +9,12 @@ class Window final : public CWindowImpl<Window, CWindow, WindowTraits>
 public:
     struct Properties
     {
-        unsigned int Width;
-        unsigned int Height;
+        int Width;
+        int Height;
         std::wstring Title;
 
-        Properties(unsigned int width = 1280,
-                   unsigned int height = 720,
+        Properties(int width = 1280,
+                   int height = 720,
                    const std::wstring &title = L"DirectX Program")
             :
             Width(width),

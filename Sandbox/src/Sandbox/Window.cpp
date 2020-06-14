@@ -5,14 +5,15 @@ Window::Window(const Properties &props)
     :
     m_Data(props)
 {
-    RECT wr = { 0, 0, static_cast<LONG>(m_Data.Width), static_cast<LONG>(m_Data.Height) };
+    RECT wr = { 0, 0, m_Data.Width, m_Data.Height };
     ::AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
     wr = { 0, 0, wr.right - wr.left, wr.bottom - wr.top };
 
     Create(nullptr, &wr, m_Data.Title.c_str(), WS_OVERLAPPEDWINDOW);
 
     m_Graphics = std::make_unique<DX11::Graphics>(m_hWnd);
-    m_Graphics->SetViewport(m_Data.Width, m_Data.Height);
+    m_Graphics->SetViewport(static_cast<float>(m_Data.Width), 
+                            static_cast<float>(m_Data.Height));
 }
 
 void Window::OnUpdate()
