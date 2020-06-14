@@ -6,10 +6,10 @@ Window::Window(const Properties &props)
     m_Data(props)
 {
     RECT wr = { 0, 0, m_Data.Width, m_Data.Height };
-    ::AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
+    ::AdjustWindowRect(&wr, WindowTraits::GetWndStyle(0), FALSE);
     wr = { 0, 0, wr.right - wr.left, wr.bottom - wr.top };
 
-    Create(nullptr, &wr, m_Data.Title.c_str(), WS_OVERLAPPEDWINDOW);
+    Create(nullptr, &wr, m_Data.Title.c_str());
 
     m_Graphics = std::make_unique<DX11::Graphics>(m_hWnd);
     m_Graphics->SetViewport(static_cast<float>(m_Data.Width), 
