@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Sandbox/Clock.h"
 #include "Sandbox/Graphics/DX11/Graphics.h"
 
 using WindowTraits = CWinTraits<WS_OVERLAPPEDWINDOW>;
@@ -49,4 +50,5 @@ public:
 private:
     Properties m_Data;
     std::unique_ptr<DX11::Graphics> m_Graphics;
+    Clock m_Clock;
 };

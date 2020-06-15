@@ -1,7 +1,5 @@
 #pragma once
 
-#include <chrono>
-
 namespace DX11
 {
 
@@ -23,14 +21,12 @@ namespace DX11
         void EndFrame();
 
         // Temporary "debug" method
-        void DrawCube();
+        void DrawCube(float step);
 
         Graphics &operator=(const Graphics &) = delete;
 
     private:
         void InitDeviceAndSwapChain(HWND windowHandle);
-
-        std::chrono::steady_clock::time_point m_TimeLast;
 
         Microsoft::WRL::ComPtr<ID3D11Device> m_Device;
         Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_Context;

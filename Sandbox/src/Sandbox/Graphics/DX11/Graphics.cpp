@@ -3,14 +3,11 @@
 
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
-namespace chr = std::chrono;
 
 namespace DX11
 {
 
     Graphics::Graphics(HWND windowHandle)
-        :
-        m_TimeLast(chr::steady_clock::now())
     {
         InitDeviceAndSwapChain(windowHandle);
         InitBackBuffer();
@@ -104,7 +101,7 @@ namespace DX11
         m_SwapChain->Present(0, 0);
     }
 
-    void Graphics::DrawCube()
+    void Graphics::DrawCube(float step)
     {
         // Initialise shaders
 
@@ -295,8 +292,6 @@ namespace DX11
         UINT vpCount = 1;
         D3D11_VIEWPORT vp = { };
         m_Context->RSGetViewports(&vpCount, &vp);
-
-        float step = chr::duration<float>(chr::steady_clock::now() - m_TimeLast).count();
 
         dx::XMMATRIX model = dx::XMMatrixRotationX(step / 4.0f) *
                              dx::XMMatrixRotationY(step) *

@@ -12,8 +12,8 @@ public:
     void Set();
     void Tick();
 
-    double TimeTotal() const;
-    double TimeDelta() const;
+    float TimeTotal() const;
+    float TimeDelta() const;
 
     Clock &operator=(const Clock &) = delete;
 
@@ -24,6 +24,6 @@ private:
     long long int m_CurrentTime;
     long long int m_PreviousTime;
 
-    double m_SecondsPerTick;
-    double m_Delta;
+    float m_SecondsPerTick;
+    float m_Delta;
 };

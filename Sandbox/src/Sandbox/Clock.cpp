@@ -12,7 +12,7 @@ Clock::Clock()
 {
     LARGE_INTEGER freq = { };
     QueryPerformanceFrequency(&freq);
-    m_SecondsPerTick = 1.0 / freq.QuadPart;
+    m_SecondsPerTick = 1.0f / freq.QuadPart;
 }
 
 void Clock::Start()
@@ -64,12 +64,12 @@ void Clock::Tick()
     if (m_Delta < 0.0) m_Delta = 0.0;
 }
 
-double Clock::TimeTotal() const
+float Clock::TimeTotal() const
 {
     return (m_CurrentTime - m_StartTime) * m_SecondsPerTick;
 }
 
-double Clock::TimeDelta() const
+float Clock::TimeDelta() const
 {
     return m_Delta;
 }
