@@ -114,8 +114,10 @@ namespace DX11
         wrl::ComPtr<ID3D11VertexShader> vs;
         wrl::ComPtr<ID3D11PixelShader> ps;
 
-        D3DReadFileToBlob(L"Test_VS.cso", &vsBlob);
-        D3DReadFileToBlob(L"Test_PS.cso", &psBlob);
+        //D3DReadFileToBlob(L"Test_VS.cso", &vsBlob);
+        //D3DReadFileToBlob(L"Test_PS.cso", &psBlob);
+        D3DReadFileToBlob(L"Phong_VS.cso", &vsBlob);
+        D3DReadFileToBlob(L"Phong_PS.cso", &psBlob);
 
         m_Device->CreateVertexShader(vsBlob->GetBufferPointer(),
                                      vsBlob->GetBufferSize(),
@@ -144,7 +146,7 @@ namespace DX11
                 0
             },
             {
-                "COLOR",
+                "NORMAL",
                 0,
                 DXGI_FORMAT_R32G32B32_FLOAT,
                 0,
@@ -172,16 +174,56 @@ namespace DX11
             dx::XMFLOAT3 Color;
         };
 
+        // TODO: Stop hard-coding geometries
         VERTEX3D cube[] =
         {
-            { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //0
+            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //4
+            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //1
+                                                                             
+            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //5
+            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //1
+            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //4
+                                                                      
+            { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //0
+            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //1
+            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //2
+                                                                      
+            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //3
+            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //2
+            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //1
+                                                                      
+            { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //0
+            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //2
+            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //4
+                                                                             
+            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //6
+            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //4
+            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //2
+
+            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //1
+            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //5
+            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //3
+
+            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //7
+            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //3
+            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //5
+
+            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //3
+            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //7
+            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //2
+
+            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //6
+            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //2
+            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //7
+
+            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //4
+            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //6
+            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //5
+
+            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //7
+            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //5
+            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //6
         };
 
         // Initialise Vertex Buffer
@@ -209,8 +251,10 @@ namespace DX11
                                       &stride,
                                       &offset);
 
-        // Define indices
+        // Cannot use indices (for now) if normals are not interpolated
 
+        // Define indices
+        /*
         const unsigned short indices[] = 
         { 
             0, 4, 1,   5, 1, 4,
@@ -238,12 +282,14 @@ namespace DX11
         // Bind Index Buffer to IA stage
 
         m_Context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+        */
 
         // Define constant buffer
 
         struct ConstBuffer
         {
-            dx::XMMATRIX Transform;
+            dx::XMMATRIX World;
+            dx::XMMATRIX WorldViewProj;
         };
 
         UINT vpCount = 1;
@@ -252,11 +298,15 @@ namespace DX11
 
         float step = chr::duration<float>(chr::steady_clock::now() - m_TimeLast).count();
 
+        dx::XMMATRIX model = dx::XMMatrixRotationX(step / 4.0f) *
+                             dx::XMMatrixRotationY(step) *
+                             dx::XMMatrixTranslation(0.0f, 0.0f, 5.0f);
+
         const ConstBuffer cb =
         {
-            dx::XMMatrixTranspose(dx::XMMatrixRotationX(step / 4.0f) *
-                                  dx::XMMatrixRotationY(step) *
-                                  dx::XMMatrixTranslation(0.0f, 0.0f, 4.0f) * 
+            dx::XMMatrixTranspose(model),
+
+            dx::XMMatrixTranspose(model *
                                   dx::XMMatrixPerspectiveLH(1.0f, vp.Height / vp.Width, 0.5f, 10.0f))
         };
 
@@ -284,7 +334,8 @@ namespace DX11
 
         // Finally
 
-        m_Context->DrawIndexed(static_cast<UINT>(std::size(indices)), 0, 0);
+        //m_Context->DrawIndexed(static_cast<UINT>(std::size(indices)), 0, 0);
+        m_Context->Draw(static_cast<UINT>(std::size(cube)), 0);
     }
 
 }

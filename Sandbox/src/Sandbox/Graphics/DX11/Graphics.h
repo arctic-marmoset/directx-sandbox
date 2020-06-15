@@ -17,7 +17,7 @@ namespace DX11
         void SetViewport(float width, float height);
         
         void InitBackBuffer();
-        void ClearBackBuffer(float red, float green, float blue);
+        void ClearBackBuffer(float red = 0.0f, float green = 0.0f, float blue = 0.0f);
 
         void BeginFrame();
         void EndFrame();

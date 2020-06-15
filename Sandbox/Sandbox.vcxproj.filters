@@ -48,5 +48,7 @@
   <ItemGroup>
     <FxCompile Include="src\Sandbox\Shaders\Test_VS.hlsl" />
     <FxCompile Include="src\Sandbox\Shaders\Test_PS.hlsl" />
+    <FxCompile Include="src\Sandbox\Shaders\Phong_VS.hlsl" />
+    <FxCompile Include="src\Sandbox\Shaders\Phong_PS.hlsl" />
   </ItemGroup>
 </Project>
