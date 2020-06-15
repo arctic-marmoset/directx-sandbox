@@ -104,11 +104,13 @@
   <ItemGroup>
     <ClCompile Include="src\gspch.cpp" />
     <ClCompile Include="src\Sandbox.cpp" />
+    <ClCompile Include="src\Sandbox\Clock.cpp" />
     <ClCompile Include="src\Sandbox\Graphics\DX11\Graphics.cpp" />
     <ClCompile Include="src\Sandbox\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gspch.h" />
+    <ClInclude Include="src\Sandbox\Clock.h" />
     <ClInclude Include="src\Sandbox\Graphics\DX11\Graphics.h" />
     <ClInclude Include="src\Sandbox\Window.h" />
   </ItemGroup>
