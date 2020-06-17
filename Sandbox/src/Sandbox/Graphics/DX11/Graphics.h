@@ -11,12 +11,9 @@ namespace DX11
         ~Graphics();
 
         void OnResize(float width, float height);
+        void SetViewport(float width = 0.0f, float height = 0.0f);
 
-        void SetViewport(float width, float height);
-        
-        void InitBackBuffer();
-        void ClearBackBuffer(float red = 0.0f, float green = 0.0f, float blue = 0.0f);
-
+        void Clear(float red = 0.0f, float green = 0.0f, float blue = 0.0f);
         void BeginFrame();
         void EndFrame();
 
@@ -26,12 +23,19 @@ namespace DX11
         Graphics &operator=(const Graphics &) = delete;
 
     private:
-        void InitDeviceAndSwapChain(HWND windowHandle);
+        void InitDeviceAndSwapChain();
+        void InitBackBuffer();
+        void InitDepthStencilBuffer();
+
+    private:
+        HWND m_WindowHandle;
 
         Microsoft::WRL::ComPtr<ID3D11Device> m_Device;
         Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_Context;
         Microsoft::WRL::ComPtr<IDXGISwapChain> m_SwapChain;
         Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_Target;
+
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DepthView;
     };
 
 }

@@ -15,7 +15,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     while (Window::ProcessMessages())
     {
         window.OnUpdate();
-
     }
 
     return 0;

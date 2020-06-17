@@ -5,7 +5,6 @@ Window::Window(const Properties &props)
     :
     m_Data(props)
 {
-    m_Clock.Set();
     RECT wr = { 0, 0, m_Data.Width, m_Data.Height };
     ::AdjustWindowRect(&wr, WindowTraits::GetWndStyle(0), FALSE);
     wr = { 0, 0, wr.right - wr.left, wr.bottom - wr.top };
@@ -21,7 +20,7 @@ void Window::OnUpdate()
 {
     m_Clock.Tick();
     m_Graphics->BeginFrame();
-    m_Graphics->ClearBackBuffer(0.1f, 0.1f, 0.1f);
+    m_Graphics->Clear(0.1f, 0.1f, 0.1f);
     m_Graphics->DrawCube(m_Clock.TimeTotal());
     m_Graphics->EndFrame();
 }

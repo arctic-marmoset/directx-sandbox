@@ -8,19 +8,23 @@ namespace DX11
 {
 
     Graphics::Graphics(HWND windowHandle)
+        :
+        m_WindowHandle(windowHandle)
     {
-        InitDeviceAndSwapChain(windowHandle);
+        InitDeviceAndSwapChain();
         InitBackBuffer();
+        InitDepthStencilBuffer();
+        SetViewport();
     }
 
-    void Graphics::InitDeviceAndSwapChain(HWND windowHandle)
+    void Graphics::InitDeviceAndSwapChain()
     {
         DXGI_SWAP_CHAIN_DESC scd = { };
         scd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
         scd.SampleDesc.Count = 1;
         scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         scd.BufferCount = 2;
-        scd.OutputWindow = windowHandle;
+        scd.OutputWindow = m_WindowHandle;
         scd.Windowed = TRUE;
         scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -52,15 +56,20 @@ namespace DX11
 
     void Graphics::OnResize(float width, float height)
     {
-        if (m_SwapChain)
+        if (!m_SwapChain)
         {
-            m_Context->OMSetRenderTargets(0, nullptr, nullptr);
-            m_Target->Release();
-            m_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-
-            InitBackBuffer();
-            SetViewport(width, height);
+            return;
         }
+
+        m_Context->OMSetRenderTargets(0, nullptr, nullptr);
+
+        m_Target->Release();
+        m_DepthView->Release();
+
+        m_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+        InitBackBuffer();
+        InitDepthStencilBuffer();
+        SetViewport(width, height);
     }
 
     void Graphics::InitBackBuffer()
@@ -75,6 +84,44 @@ namespace DX11
                                          m_Target.GetAddressOf());
     }
 
+    void Graphics::InitDepthStencilBuffer()
+    {
+        D3D11_DEPTH_STENCIL_DESC dsd = { };
+        dsd.DepthEnable = TRUE;
+        dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+        dsd.DepthFunc = D3D11_COMPARISON_LESS;
+
+        wrl::ComPtr<ID3D11DepthStencilState> dsState;
+        m_Device->CreateDepthStencilState(&dsd, &dsState);
+
+        m_Context->OMSetDepthStencilState(dsState.Get(), 0);
+
+        DXGI_SWAP_CHAIN_DESC desc = { };
+        m_SwapChain->GetDesc(&desc);
+
+        D3D11_TEXTURE2D_DESC dbd = { };
+        dbd.Width = desc.BufferDesc.Width;
+        dbd.Height = desc.BufferDesc.Height;
+        dbd.MipLevels = 1;
+        dbd.ArraySize = 1;
+        dbd.Format = DXGI_FORMAT_D32_FLOAT;
+        dbd.SampleDesc.Count = 1;
+        dbd.Usage = D3D11_USAGE_DEFAULT;
+        dbd.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+        wrl::ComPtr<ID3D11Texture2D> pDepthBuffer;
+        m_Device->CreateTexture2D(&dbd, nullptr, &pDepthBuffer);
+
+        D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = { };
+        dsvd.Format = DXGI_FORMAT_UNKNOWN;
+        dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+        dsvd.Texture2D.MipSlice = 0;
+
+        m_Device->CreateDepthStencilView(pDepthBuffer.Get(), 
+                                         &dsvd, 
+                                         m_DepthView.GetAddressOf());
+    }
+
     void Graphics::SetViewport(float width, float height)
     {
         D3D11_VIEWPORT viewport = { };
@@ -85,15 +132,16 @@ namespace DX11
         m_Context->RSSetViewports(1, &viewport);
     }
 
-    void Graphics::ClearBackBuffer(float red, float green, float blue)
+    void Graphics::Clear(float red, float green, float blue)
     {
         const float color[] = { red, green, blue, 1.0f };
         m_Context->ClearRenderTargetView(m_Target.Get(), color);
+        m_Context->ClearDepthStencilView(m_DepthView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
     }
 
     void Graphics::BeginFrame()
     {
-        m_Context->OMSetRenderTargets(1, m_Target.GetAddressOf(), nullptr);
+        m_Context->OMSetRenderTargets(1, m_Target.GetAddressOf(), m_DepthView.Get());
     }
 
     void Graphics::EndFrame()
@@ -302,7 +350,7 @@ namespace DX11
             dx::XMMatrixTranspose(model),
 
             dx::XMMatrixTranspose(model *
-                                  dx::XMMatrixPerspectiveLH(1.0f, vp.Height / vp.Width, 0.5f, 10.0f))
+                                  dx::XMMatrixPerspectiveFovLH(dx::XMConvertToRadians(47), vp.Width / vp.Height, 0.05f, 100.0f))
         };
 
         // Initialise Constant Buffer
