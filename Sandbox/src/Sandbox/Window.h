@@ -49,7 +49,7 @@ public:
     Window &operator=(const Window &) = delete;
 
 public:
-    static bool ProcessMessages();
+    static void ProcessMessages();
 
 private:
     struct WindowData
