@@ -53,6 +53,9 @@
     <ClInclude Include="src\Sandbox\Graphics\DX11\Graphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Sandbox\Events\ApplicationEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Sandbox\Shaders\Test_VS.hlsl" />

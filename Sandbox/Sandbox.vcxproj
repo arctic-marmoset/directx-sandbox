@@ -116,6 +116,10 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="src\Sandbox\Clock.h" />
+    <ClInclude Include="src\Sandbox\Events\ApplicationEvent.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="src\Sandbox\Events\Event.h">
       <SubType>
       </SubType>

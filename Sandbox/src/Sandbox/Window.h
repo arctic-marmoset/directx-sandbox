@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Sandbox/Events/Event.h"
-
+class Event;
 using WindowTraits = CWinTraits<WS_OVERLAPPEDWINDOW>;
 
 class Window final : public CWindowImpl<Window, CWindow, WindowTraits>
