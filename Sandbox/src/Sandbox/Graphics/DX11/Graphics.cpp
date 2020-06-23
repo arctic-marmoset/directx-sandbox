@@ -7,46 +7,13 @@ namespace dx = DirectX;
 namespace DX11
 {
 
-    Graphics::Graphics(HWND windowHandle)
+    Graphics::Graphics()
         :
-        m_WindowHandle(windowHandle)
+        m_WindowHandle(nullptr),
+        m_LogicalWidth(0),
+        m_LogicalHeight(0)
     {
-        InitDeviceAndSwapChain();
-        InitBackBuffer();
-        InitDepthStencilBuffer();
-        SetViewport();
-    }
-
-    void Graphics::InitDeviceAndSwapChain()
-    {
-        DXGI_SWAP_CHAIN_DESC scd = { };
-        scd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        scd.SampleDesc.Count = 1;
-        scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        scd.BufferCount = 2;
-        scd.OutputWindow = m_WindowHandle;
-        scd.Windowed = TRUE;
-        scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-        scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-
-        UINT createDeviceFlags = 0;
-
-    #ifndef NDEBUG
-        createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-    #endif
-
-        D3D11CreateDeviceAndSwapChain(nullptr,
-                                      D3D_DRIVER_TYPE_HARDWARE,
-                                      nullptr,
-                                      createDeviceFlags,
-                                      nullptr,
-                                      0,
-                                      D3D11_SDK_VERSION,
-                                      &scd,
-                                      &m_SwapChain,
-                                      &m_Device,
-                                      nullptr,
-                                      &m_DeviceContext);
+        InitDeviceResources();
     }
 
     Graphics::~Graphics()
@@ -54,99 +21,173 @@ namespace DX11
         m_SwapChain->SetFullscreenState(FALSE, nullptr);
     }
 
-    void Graphics::OnResize(float width, float height)
+    void Graphics::InitDeviceResources()
     {
-        if (!m_SwapChain)
+        D3D_FEATURE_LEVEL featureLevels[] =
         {
-            return;
+            D3D_FEATURE_LEVEL_11_1,
+            D3D_FEATURE_LEVEL_11_0,
+        };
+
+        UINT createDeviceFlags = 0;
+
+    #ifndef NDEBUG
+        createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+    #endif
+
+        wrl::ComPtr<ID3D11Device> device;
+        wrl::ComPtr<ID3D11DeviceContext> context;
+
+        HRESULT hr = D3D11CreateDevice(nullptr,
+                                       D3D_DRIVER_TYPE_HARDWARE,
+                                       0,
+                                       createDeviceFlags,
+                                       featureLevels,
+                                       std::size(featureLevels),
+                                       D3D11_SDK_VERSION,
+                                       &device,
+                                       &m_FeatureLevel,
+                                       &context);
+
+        if (FAILED(hr))
+        {
+            // TODO: Handle error
         }
 
-        m_DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
-
-        m_RenderTargetView->Release();
-        m_DepthStencilView->Release();
-
-        m_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-        InitBackBuffer();
-        InitDepthStencilBuffer();
-        SetViewport(width, height);
+        // Store device and context pointers.
+        device.As(&m_Device);
+        context.As(&m_Context);
     }
 
-    void Graphics::InitBackBuffer()
+    void Graphics::SetWindow(HWND windowHandle)
     {
-        wrl::ComPtr<ID3D11Texture2D> pBackBuffer;
-        m_SwapChain->GetBuffer(0,
-                               __uuidof(ID3D11Texture2D),
-                               &pBackBuffer);
+        m_WindowHandle = windowHandle;
 
-        m_Device->CreateRenderTargetView(pBackBuffer.Get(),
-                                         nullptr,
-                                         m_RenderTargetView.GetAddressOf());
+        RECT cr = { };
+        GetClientRect(windowHandle, &cr);
+        m_LogicalWidth = cr.right - cr.left;
+        m_LogicalHeight = cr.bottom - cr.top;
+        InitDimensionDependentResources();
     }
 
-    void Graphics::InitDepthStencilBuffer()
+    void Graphics::SetDimensions(int width, int height)
     {
-        D3D11_DEPTH_STENCIL_DESC dsd = { };
-        dsd.DepthEnable = TRUE;
-        dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-        dsd.DepthFunc = D3D11_COMPARISON_LESS;
-
-        wrl::ComPtr<ID3D11DepthStencilState> dsState;
-        m_Device->CreateDepthStencilState(&dsd, &dsState);
-
-        m_DeviceContext->OMSetDepthStencilState(dsState.Get(), 0);
-
-        DXGI_SWAP_CHAIN_DESC desc = { };
-        m_SwapChain->GetDesc(&desc);
-
-        D3D11_TEXTURE2D_DESC dbd = { };
-        dbd.Width = desc.BufferDesc.Width;
-        dbd.Height = desc.BufferDesc.Height;
-        dbd.MipLevels = 1;
-        dbd.ArraySize = 1;
-        dbd.Format = DXGI_FORMAT_D32_FLOAT;
-        dbd.SampleDesc.Count = 1;
-        dbd.Usage = D3D11_USAGE_DEFAULT;
-        dbd.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-
-        wrl::ComPtr<ID3D11Texture2D> pDepthBuffer;
-        m_Device->CreateTexture2D(&dbd, nullptr, &pDepthBuffer);
-
-        D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = { };
-        dsvd.Format = DXGI_FORMAT_UNKNOWN;
-        dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-        dsvd.Texture2D.MipSlice = 0;
-
-        m_Device->CreateDepthStencilView(pDepthBuffer.Get(), 
-                                         &dsvd, 
-                                         m_DepthStencilView.GetAddressOf());
+        if (m_LogicalWidth != width || m_LogicalHeight != height)
+        {
+            m_LogicalWidth = width;
+            m_LogicalHeight = height;
+            InitDimensionDependentResources();
+        }
     }
 
-    void Graphics::SetViewport(float width, float height)
+    void Graphics::InitDimensionDependentResources()
     {
-        D3D11_VIEWPORT viewport = { };
-        viewport.Width = width;
-        viewport.Height = height;
-        viewport.MinDepth = 0.0f;
-        viewport.MaxDepth = 1.0f;
-        m_DeviceContext->RSSetViewports(1, &viewport);
+        ID3D11RenderTargetView *nullViews[] = { nullptr };
+        m_Context->OMSetRenderTargets(std::size(nullViews), nullViews, nullptr);
+        m_RenderTargetView = nullptr;
+        m_DepthStencilView = nullptr;
+        m_Context->Flush();
+
+        if (m_SwapChain)
+        {
+            HRESULT hr = m_SwapChain->ResizeBuffers(0,
+                                                    m_LogicalWidth,
+                                                    m_LogicalHeight,
+                                                    DXGI_FORMAT_UNKNOWN,
+                                                    0);
+
+            if (FAILED(hr))
+            {
+                // TODO: Handle error
+            }
+        }
+        else
+        {
+            // Swapchain does not exist, so create a new one.
+            DXGI_SWAP_CHAIN_DESC1 scd = { };
+            scd.Width = m_LogicalWidth;
+            scd.Height = m_LogicalHeight;
+            scd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+            scd.SampleDesc.Count = 1;
+            scd.SampleDesc.Quality = 0;
+            scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+            scd.BufferCount = 2;
+            scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+            scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+            DXGI_SWAP_CHAIN_FULLSCREEN_DESC scfsd = { };
+            scfsd.Windowed = TRUE;
+
+            // Get the DXGIFactory that created m_Device
+            wrl::ComPtr<IDXGIDevice3> dxgiDevice;
+            m_Device.As(&dxgiDevice);
+
+            wrl::ComPtr<IDXGIAdapter> dxgiAdapter;
+            dxgiDevice->GetAdapter(&dxgiAdapter);
+
+            wrl::ComPtr<IDXGIFactory3> dxgiFactory;
+            dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory));
+
+            dxgiFactory->CreateSwapChainForHwnd(m_Device.Get(),
+                                                m_WindowHandle,
+                                                &scd,
+                                                &scfsd,
+                                                nullptr,
+                                                &m_SwapChain);
+
+            dxgiDevice->SetMaximumFrameLatency(1);
+        }
+
+        // Create a render target view of the swapchain backbuffer.
+        wrl::ComPtr<ID3D11Texture2D> backBuffer;
+        m_SwapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
+
+        m_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, &m_RenderTargetView);
+
+        // Create a depth stencil buffer view.
+        D3D11_TEXTURE2D_DESC dsd = { };
+        dsd.Width = m_LogicalWidth;
+        dsd.Height = m_LogicalHeight;
+        dsd.MipLevels = 1;
+        dsd.ArraySize = 1;
+        dsd.Format = DXGI_FORMAT_D32_FLOAT;
+        dsd.SampleDesc.Count = 1;
+        dsd.SampleDesc.Quality = 0;
+        dsd.Usage = D3D11_USAGE_DEFAULT;
+        dsd.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+        wrl::ComPtr<ID3D11Texture2D> depthStencil;
+        m_Device->CreateTexture2D(&dsd, nullptr, &depthStencil);
+
+        CD3D11_DEPTH_STENCIL_VIEW_DESC dsvd(D3D11_DSV_DIMENSION_TEXTURE2D);
+        m_Device->CreateDepthStencilView(depthStencil.Get(),
+                                         &dsvd,
+                                         &m_DepthStencilView);
+
+        // Set render viewport.
+        m_RenderViewport = CD3D11_VIEWPORT(0.0f, 0.0f, m_LogicalWidth, m_LogicalHeight);
+        m_Context->RSSetViewports(1, &m_RenderViewport);
     }
 
     void Graphics::Clear(float red, float green, float blue)
     {
         const float color[] = { red, green, blue, 1.0f };
-        m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), color);
-        m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+        m_Context->ClearRenderTargetView(m_RenderTargetView.Get(), color);
+        m_Context->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
     }
 
     void Graphics::BeginFrame()
     {
-        m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+        m_Context->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
     }
 
     void Graphics::EndFrame()
     {
-        m_SwapChain->Present(0, 0);
+        HRESULT hr = m_SwapChain->Present(0, 0);
+        if (FAILED(hr))
+        {
+            // TODO: Handle error
+        }
     }
 
     void Graphics::DrawCube(float step)
@@ -174,8 +215,8 @@ namespace DX11
                                     nullptr,
                                     &ps);
 
-        m_DeviceContext->VSSetShader(vs.Get(), nullptr, 0);
-        m_DeviceContext->PSSetShader(ps.Get(), nullptr, 0);
+        m_Context->VSSetShader(vs.Get(), nullptr, 0);
+        m_Context->PSSetShader(ps.Get(), nullptr, 0);
 
         // Define input layout
 
@@ -209,7 +250,7 @@ namespace DX11
                                     vsBlob->GetBufferSize(),
                                     &inputLayout);
 
-        m_DeviceContext->IASetInputLayout(inputLayout.Get());
+        m_Context->IASetInputLayout(inputLayout.Get());
 
         // Define vertex resources
 
@@ -290,7 +331,7 @@ namespace DX11
         const UINT stride = sizeof(VERTEX3D);
         const UINT offset = 0;
 
-        m_DeviceContext->IASetVertexBuffers(0,
+        m_Context->IASetVertexBuffers(0,
                                       1,
                                       vertexBuffer.GetAddressOf(),
                                       &stride,
@@ -339,7 +380,7 @@ namespace DX11
 
         UINT vpCount = 1;
         D3D11_VIEWPORT vp = { };
-        m_DeviceContext->RSGetViewports(&vpCount, &vp);
+        m_Context->RSGetViewports(&vpCount, &vp);
 
         dx::XMMATRIX model = dx::XMMatrixRotationX(step / 4.0f) *
                              dx::XMMatrixRotationY(step) *
@@ -369,16 +410,16 @@ namespace DX11
 
         // Bind Constant Buffer to VS stage
 
-        m_DeviceContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+        m_Context->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
         // Describe topology
 
-        m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         // Finally
 
         //m_Context->DrawIndexed(static_cast<UINT>(std::size(indices)), 0, 0);
-        m_DeviceContext->Draw(static_cast<UINT>(std::size(cube)), 0);
+        m_Context->Draw(static_cast<UINT>(std::size(cube)), 0);
     }
 
 }

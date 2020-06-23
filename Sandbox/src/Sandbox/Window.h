@@ -1,13 +1,14 @@
 #pragma once
 
-#include "Sandbox/Clock.h"
-#include "Sandbox/Graphics/DX11/Graphics.h"
+#include "Sandbox/Events/Event.h"
 
 using WindowTraits = CWinTraits<WS_OVERLAPPEDWINDOW>;
 
 class Window final : public CWindowImpl<Window, CWindow, WindowTraits>
 {
 public:
+    using EventCallbackFn = std::function<void(Event &)>;
+
     struct Properties
     {
         int Width;
@@ -37,7 +38,10 @@ public:
     Window(const Properties &props = Properties());
     Window(const Window &) = delete;
 
-    void OnUpdate();
+    int GetWidth() const { return m_Data.Width; }
+    int GetHeight() const { return m_Data.Height; }
+
+    void SetEventCallback(const EventCallbackFn &callback) { m_Data.EventCallback = callback; }
     
     LRESULT OnResize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
     LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
@@ -48,7 +52,21 @@ public:
     static bool ProcessMessages();
 
 private:
-    Properties m_Data;
-    std::unique_ptr<DX11::Graphics> m_Graphics;
-    Clock m_Clock;
+    struct WindowData
+    {
+        int Width;
+        int Height;
+        std::wstring Title;
+        EventCallbackFn EventCallback;
+
+        WindowData(const Properties &props)
+            :
+            Width(props.Width),
+            Height(props.Height),
+            Title(props.Title)
+        {
+        }
+    };
+
+    WindowData m_Data;
 };

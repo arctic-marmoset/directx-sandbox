@@ -1,6 +1,5 @@
 #include "gspch.h"
-#include "Sandbox/Window.h"
-#include "Sandbox/Clock.h"
+#include "Sandbox/Application.h"
 
 int main(int argc, char *argv[])
 {
@@ -9,13 +8,7 @@ int main(int argc, char *argv[])
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-    Window window;
-    window.ShowWindow(nCmdShow);
-
-    while (Window::ProcessMessages())
-    {
-        window.OnUpdate();
-    }
-
+    Application app;
+    app.Run();
     return 0;
 }
