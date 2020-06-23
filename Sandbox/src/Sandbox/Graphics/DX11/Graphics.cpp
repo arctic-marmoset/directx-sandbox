@@ -46,7 +46,7 @@ namespace DX11
                                       &m_SwapChain,
                                       &m_Device,
                                       nullptr,
-                                      &m_Context);
+                                      &m_DeviceContext);
     }
 
     Graphics::~Graphics()
@@ -61,10 +61,10 @@ namespace DX11
             return;
         }
 
-        m_Context->OMSetRenderTargets(0, nullptr, nullptr);
+        m_DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 
-        m_Target->Release();
-        m_DepthView->Release();
+        m_RenderTargetView->Release();
+        m_DepthStencilView->Release();
 
         m_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
         InitBackBuffer();
@@ -81,7 +81,7 @@ namespace DX11
 
         m_Device->CreateRenderTargetView(pBackBuffer.Get(),
                                          nullptr,
-                                         m_Target.GetAddressOf());
+                                         m_RenderTargetView.GetAddressOf());
     }
 
     void Graphics::InitDepthStencilBuffer()
@@ -94,7 +94,7 @@ namespace DX11
         wrl::ComPtr<ID3D11DepthStencilState> dsState;
         m_Device->CreateDepthStencilState(&dsd, &dsState);
 
-        m_Context->OMSetDepthStencilState(dsState.Get(), 0);
+        m_DeviceContext->OMSetDepthStencilState(dsState.Get(), 0);
 
         DXGI_SWAP_CHAIN_DESC desc = { };
         m_SwapChain->GetDesc(&desc);
@@ -119,7 +119,7 @@ namespace DX11
 
         m_Device->CreateDepthStencilView(pDepthBuffer.Get(), 
                                          &dsvd, 
-                                         m_DepthView.GetAddressOf());
+                                         m_DepthStencilView.GetAddressOf());
     }
 
     void Graphics::SetViewport(float width, float height)
@@ -129,19 +129,19 @@ namespace DX11
         viewport.Height = height;
         viewport.MinDepth = 0.0f;
         viewport.MaxDepth = 1.0f;
-        m_Context->RSSetViewports(1, &viewport);
+        m_DeviceContext->RSSetViewports(1, &viewport);
     }
 
     void Graphics::Clear(float red, float green, float blue)
     {
         const float color[] = { red, green, blue, 1.0f };
-        m_Context->ClearRenderTargetView(m_Target.Get(), color);
-        m_Context->ClearDepthStencilView(m_DepthView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+        m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), color);
+        m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
     }
 
     void Graphics::BeginFrame()
     {
-        m_Context->OMSetRenderTargets(1, m_Target.GetAddressOf(), m_DepthView.Get());
+        m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
     }
 
     void Graphics::EndFrame()
@@ -174,8 +174,8 @@ namespace DX11
                                     nullptr,
                                     &ps);
 
-        m_Context->VSSetShader(vs.Get(), nullptr, 0);
-        m_Context->PSSetShader(ps.Get(), nullptr, 0);
+        m_DeviceContext->VSSetShader(vs.Get(), nullptr, 0);
+        m_DeviceContext->PSSetShader(ps.Get(), nullptr, 0);
 
         // Define input layout
 
@@ -209,7 +209,7 @@ namespace DX11
                                     vsBlob->GetBufferSize(),
                                     &inputLayout);
 
-        m_Context->IASetInputLayout(inputLayout.Get());
+        m_DeviceContext->IASetInputLayout(inputLayout.Get());
 
         // Define vertex resources
 
@@ -290,7 +290,7 @@ namespace DX11
         const UINT stride = sizeof(VERTEX3D);
         const UINT offset = 0;
 
-        m_Context->IASetVertexBuffers(0,
+        m_DeviceContext->IASetVertexBuffers(0,
                                       1,
                                       vertexBuffer.GetAddressOf(),
                                       &stride,
@@ -339,7 +339,7 @@ namespace DX11
 
         UINT vpCount = 1;
         D3D11_VIEWPORT vp = { };
-        m_Context->RSGetViewports(&vpCount, &vp);
+        m_DeviceContext->RSGetViewports(&vpCount, &vp);
 
         dx::XMMATRIX model = dx::XMMatrixRotationX(step / 4.0f) *
                              dx::XMMatrixRotationY(step) *
@@ -369,16 +369,16 @@ namespace DX11
 
         // Bind Constant Buffer to VS stage
 
-        m_Context->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+        m_DeviceContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
         // Describe topology
 
-        m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         // Finally
 
         //m_Context->DrawIndexed(static_cast<UINT>(std::size(indices)), 0, 0);
-        m_Context->Draw(static_cast<UINT>(std::size(cube)), 0);
+        m_DeviceContext->Draw(static_cast<UINT>(std::size(cube)), 0);
     }
 
 }
