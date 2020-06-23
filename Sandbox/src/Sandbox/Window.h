@@ -27,7 +27,7 @@ public:
 
 public:
     // Passing -1 as background param to get (HBRUSH)0
-    DECLARE_WND_CLASS_EX2(L"WindowClass", Window, CS_OWNDC, -1)
+    DECLARE_WND_CLASS_EX2(L"WindowClass", Window, 0, -1)
 
     BEGIN_MSG_MAP(Window)
         MESSAGE_HANDLER(WM_SIZE, OnResize)
