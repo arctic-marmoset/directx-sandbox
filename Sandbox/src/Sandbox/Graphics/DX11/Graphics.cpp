@@ -113,7 +113,6 @@ namespace DX11
             scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
             scd.BufferCount = 2;
             scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-            scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
             DXGI_SWAP_CHAIN_FULLSCREEN_DESC scfsd = { };
             scfsd.Windowed = TRUE;
