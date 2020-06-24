@@ -11,7 +11,8 @@ namespace DX11
         :
         m_WindowHandle(nullptr),
         m_LogicalWidth(0),
-        m_LogicalHeight(0)
+        m_LogicalHeight(0),
+        m_SyncInterval(0)
     {
         InitDeviceResources();
     }
@@ -43,7 +44,7 @@ namespace DX11
                                        0,
                                        createDeviceFlags,
                                        featureLevels,
-                                       std::size(featureLevels),
+                                       ARRAYSIZE(featureLevels),
                                        D3D11_SDK_VERSION,
                                        &device,
                                        &m_FeatureLevel,
@@ -83,7 +84,7 @@ namespace DX11
     void Graphics::InitDimensionDependentResources()
     {
         ID3D11RenderTargetView *nullViews[] = { nullptr };
-        m_Context->OMSetRenderTargets(std::size(nullViews), nullViews, nullptr);
+        m_Context->OMSetRenderTargets(ARRAYSIZE(nullViews), nullViews, nullptr);
         m_RenderTargetView = nullptr;
         m_DepthStencilView = nullptr;
         m_Context->Flush();
@@ -164,7 +165,11 @@ namespace DX11
                                          &m_DepthStencilView);
 
         // Set render viewport.
-        m_RenderViewport = CD3D11_VIEWPORT(0.0f, 0.0f, m_LogicalWidth, m_LogicalHeight);
+        m_RenderViewport = CD3D11_VIEWPORT(0.0f, 
+                                           0.0f, 
+                                           static_cast<FLOAT>(m_LogicalWidth), 
+                                           static_cast<FLOAT>(m_LogicalHeight));
+
         m_Context->RSSetViewports(1, &m_RenderViewport);
     }
 
@@ -182,7 +187,7 @@ namespace DX11
 
     void Graphics::EndFrame()
     {
-        HRESULT hr = m_SwapChain->Present(0, 0);
+        HRESULT hr = m_SwapChain->Present(m_SyncInterval, 0);
         if (FAILED(hr))
         {
             // TODO: Handle error

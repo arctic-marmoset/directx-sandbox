@@ -44,6 +44,7 @@ namespace DX11
 
         int m_LogicalWidth;
         int m_LogicalHeight;
+        unsigned int m_SyncInterval;
     };
 
 }
