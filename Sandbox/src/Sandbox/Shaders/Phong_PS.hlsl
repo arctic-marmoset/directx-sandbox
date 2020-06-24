@@ -30,7 +30,7 @@ float4 main(float3 worldPos : POSITION, float3 normal : NORMAL) : SV_Target
     
     // Calculate specular component
     const float3 rCap = reflect(lCap, normal);
-    const float3 rCosine = max(0.0f, dot(rCap, normalize(worldPos)));
+    const float rCosine = max(0.0f, dot(rCap, normalize(worldPos)));
     const float specularLight = attn * kSpecularIntensity * pow(rCosine, kSpecularPower);
     
     // Reflected colour should only be whatever exists in both the light and the material
