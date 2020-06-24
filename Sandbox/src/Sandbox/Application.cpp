@@ -11,10 +11,23 @@ Application::Application()
     m_Graphics = std::make_unique<DX11::Graphics>();
     m_Graphics->SetWindow(m_Window);
     m_Window.ShowWindow(SW_SHOWDEFAULT);
+
+    InitGraphicsResources();
 }
 
 Application::~Application()
 {
+}
+
+void Application::InitGraphicsResources()
+{
+    m_VertexShader = std::make_unique<VertexShader>(*m_Graphics, L"Phong_VS.cso");
+    m_PixelShader = std::make_unique<PixelShader>(*m_Graphics, L"Phong_PS.cso");
+    m_InputLayout = std::make_unique<InputLayout>(*m_Graphics, *m_VertexShader);
+
+    m_VertexShader->Bind();
+    m_PixelShader->Bind();
+    m_InputLayout->Bind();
 }
 
 void Application::Run()

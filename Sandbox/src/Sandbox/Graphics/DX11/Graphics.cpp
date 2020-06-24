@@ -191,66 +191,6 @@ namespace DX11
 
     void Graphics::DrawCube(float step)
     {
-        // Initialise shaders
-
-        wrl::ComPtr<ID3DBlob> vsBlob;
-        wrl::ComPtr<ID3DBlob> psBlob;
-
-        wrl::ComPtr<ID3D11VertexShader> vs;
-        wrl::ComPtr<ID3D11PixelShader> ps;
-
-        //D3DReadFileToBlob(L"Test_VS.cso", &vsBlob);
-        //D3DReadFileToBlob(L"Test_PS.cso", &psBlob);
-        D3DReadFileToBlob(L"Phong_VS.cso", &vsBlob);
-        D3DReadFileToBlob(L"Phong_PS.cso", &psBlob);
-
-        m_Device->CreateVertexShader(vsBlob->GetBufferPointer(),
-                                     vsBlob->GetBufferSize(),
-                                     nullptr,
-                                     &vs);
-
-        m_Device->CreatePixelShader(psBlob->GetBufferPointer(),
-                                    psBlob->GetBufferSize(),
-                                    nullptr,
-                                    &ps);
-
-        m_Context->VSSetShader(vs.Get(), nullptr, 0);
-        m_Context->PSSetShader(ps.Get(), nullptr, 0);
-
-        // Define input layout
-
-        D3D11_INPUT_ELEMENT_DESC ied[] =
-        {
-            {
-                "POSITION",
-                0,
-                DXGI_FORMAT_R32G32B32_FLOAT,
-                0,
-                0,
-                D3D11_INPUT_PER_VERTEX_DATA,
-                0
-            },
-            {
-                "NORMAL",
-                0,
-                DXGI_FORMAT_R32G32B32_FLOAT,
-                0,
-                D3D11_APPEND_ALIGNED_ELEMENT,
-                D3D11_INPUT_PER_VERTEX_DATA,
-                0
-            }
-        };
-
-        wrl::ComPtr<ID3D11InputLayout> inputLayout;
-
-        m_Device->CreateInputLayout(ied,
-                                    static_cast<UINT>(std::size(ied)),
-                                    vsBlob->GetBufferPointer(),
-                                    vsBlob->GetBufferSize(),
-                                    &inputLayout);
-
-        m_Context->IASetInputLayout(inputLayout.Get());
-
         // Define vertex resources
 
         struct VERTEX3D

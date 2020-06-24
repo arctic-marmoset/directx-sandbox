@@ -107,6 +107,9 @@
     <ClCompile Include="src\Sandbox\Application.cpp" />
     <ClCompile Include="src\Sandbox\Clock.cpp" />
     <ClCompile Include="src\Sandbox\Graphics\DX11\Graphics.cpp" />
+    <ClCompile Include="src\Sandbox\Graphics\DX11\InputLayout.cpp" />
+    <ClCompile Include="src\Sandbox\Graphics\DX11\PixelShader.cpp" />
+    <ClCompile Include="src\Sandbox\Graphics\DX11\VertexShader.cpp" />
     <ClCompile Include="src\Sandbox\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +128,19 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="src\Sandbox\Graphics\DX11\Graphics.h" />
+    <ClInclude Include="src\Sandbox\Graphics\DX11\IBindable.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="src\Sandbox\Graphics\DX11\InputLayout.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="src\Sandbox\Graphics\DX11\PixelShader.h" />
+    <ClInclude Include="src\Sandbox\Graphics\DX11\VertexShader.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="src\Sandbox\Window.h" />
   </ItemGroup>
   <ItemGroup>

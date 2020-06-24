@@ -1,9 +1,12 @@
 #pragma once
 
-#include "Sandbox/Events/ApplicationEvent.h"
-#include "Sandbox/Window.h"
-#include "Sandbox/Graphics/DX11/Graphics.h"
 #include "Sandbox/Clock.h"
+#include "Sandbox/Window.h"
+#include "Sandbox/Events/ApplicationEvent.h"
+#include "Sandbox/Graphics/DX11/Graphics.h"
+#include "Sandbox/Graphics/DX11/VertexShader.h"
+#include "Sandbox/Graphics/DX11/PixelShader.h"
+#include "Sandbox/Graphics/DX11/InputLayout.h"
 
 class Application
 {
@@ -19,10 +22,16 @@ protected:
     bool OnWindowClosed(WindowClosedEvent &e);
 
 private:
-    bool m_WindowClosed;
+    void InitGraphicsResources();
 
+private:
+    bool m_WindowClosed;
+    Clock m_Clock;
     Window m_Window;
     std::unique_ptr<DX11::Graphics> m_Graphics;
 
-    Clock m_Clock;
+    std::unique_ptr<InputLayout>  m_InputLayout;
+    std::unique_ptr<VertexShader> m_VertexShader;
+    std::unique_ptr<PixelShader>  m_PixelShader;
+
 };

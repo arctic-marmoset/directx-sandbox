@@ -20,6 +20,9 @@ namespace DX11
         // Temporary "debug" method
         void DrawCube(float step);
 
+        ID3D11Device2 *GetD3DDevice() const         { return m_Device.Get(); }
+        ID3D11DeviceContext2 *GetD3DContext() const { return m_Context.Get(); }
+
         Graphics &operator=(const Graphics &) = delete;
 
     private:
