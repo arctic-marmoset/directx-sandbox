@@ -7,7 +7,7 @@ class VertexShader;
 class InputLayout : public IBindable
 {
 public:
-    InputLayout(const DX11::Graphics &gfx,
+    InputLayout(DX11::Graphics &gfx,
                 const VertexShader &vertexShader,
                 const D3D11_INPUT_ELEMENT_DESC *layoutDesc = nullptr,
                 std::size_t layoutDescNumElements = 0);

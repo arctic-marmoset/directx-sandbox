@@ -5,7 +5,7 @@
 class VertexShader : public IBindable
 {
 public:
-    VertexShader(const DX11::Graphics &gfx, std::wstring fileName);
+    VertexShader(DX11::Graphics &gfx, std::wstring fileName);
     ~VertexShader() = default;
 
     void Bind() const override;

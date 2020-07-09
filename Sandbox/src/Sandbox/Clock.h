@@ -18,11 +18,13 @@ public:
     Clock &operator=(const Clock &) = delete;
 
 private:
+    using TickCount = decltype(LARGE_INTEGER().QuadPart);
+
     bool m_Running;
 
-    long long int m_StartTime;
-    long long int m_CurrentTime;
-    long long int m_PreviousTime;
+    TickCount m_StartTime;
+    TickCount m_CurrentTime;
+    TickCount m_PreviousTime;
 
     float m_SecondsPerTick;
     float m_Delta;

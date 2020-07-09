@@ -2,15 +2,14 @@
 #include "PixelShader.h"
 #include "Sandbox/Graphics/DX11/Graphics.h"
 
-PixelShader::PixelShader(const DX11::Graphics &gfx, std::wstring fileName)
+PixelShader::PixelShader(DX11::Graphics &gfx, std::wstring fileName)
     :
+    IBindable(gfx),
     m_Name(std::move(fileName))
 {
-    m_Graphics = &gfx;
     D3DReadFileToBlob(m_Name.c_str(), &m_Blob);
 
-    auto device = m_Graphics->GetD3DDevice();
-    auto context = m_Graphics->GetD3DContext();
+    auto *device = m_Graphics.get().GetD3DDevice();
 
     device->CreatePixelShader(m_Blob->GetBufferPointer(),
                               m_Blob->GetBufferSize(),
@@ -20,5 +19,5 @@ PixelShader::PixelShader(const DX11::Graphics &gfx, std::wstring fileName)
 
 void PixelShader::Bind() const
 {
-    m_Graphics->GetD3DContext()->PSSetShader(m_PixelShader.Get(), nullptr, 0);
+    m_Graphics.get().GetD3DContext()->PSSetShader(m_PixelShader.Get(), nullptr, 0);
 }

@@ -14,9 +14,9 @@ public:
         int Height;
         std::wstring Title;
 
-        Properties(int width = 1280,
-                   int height = 720,
-                   const std::wstring &title = L"DirectX Program")
+        explicit Properties(int width = 1280,
+                            int height = 720,
+                            const std::wstring &title = L"DirectX Program")
             :
             Width(width),
             Height(height),

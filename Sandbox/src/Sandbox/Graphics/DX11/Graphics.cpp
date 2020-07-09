@@ -41,7 +41,7 @@ namespace DX11
 
         HRESULT hr = D3D11CreateDevice(nullptr,
                                        D3D_DRIVER_TYPE_HARDWARE,
-                                       0,
+                                       nullptr,
                                        createDeviceFlags,
                                        featureLevels,
                                        ARRAYSIZE(featureLevels),
@@ -165,9 +165,9 @@ namespace DX11
                                          &m_DepthStencilView);
 
         // Set render viewport.
-        m_RenderViewport = CD3D11_VIEWPORT(0.0f, 
-                                           0.0f, 
-                                           static_cast<FLOAT>(m_LogicalWidth), 
+        m_RenderViewport = CD3D11_VIEWPORT(0.0f,
+                                           0.0f,
+                                           static_cast<FLOAT>(m_LogicalWidth),
                                            static_cast<FLOAT>(m_LogicalHeight));
 
         m_Context->RSSetViewports(1, &m_RenderViewport);
@@ -285,8 +285,8 @@ namespace DX11
 
         // Define indices
         /*
-        const unsigned short indices[] = 
-        { 
+        const unsigned short indices[] =
+        {
             0, 4, 1,   5, 1, 4,
             0, 1, 2,   3, 2, 1,
             0, 2, 4,   6, 4, 2,

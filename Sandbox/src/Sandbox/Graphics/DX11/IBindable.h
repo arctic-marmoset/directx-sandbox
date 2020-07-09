@@ -8,11 +8,15 @@ namespace DX11
 class IBindable
 {
 public:
+    IBindable(const IBindable &) = delete;
     virtual ~IBindable() = default;
     virtual void Bind() const = 0;
 
+    IBindable &operator=(const IBindable &) = delete;
+
 protected:
-    // Store as raw pointer since Graphics is owned by Application,
-    // and Application lifetime should exceed IBindable lifetime.
-    const DX11::Graphics *m_Graphics = nullptr;
+    explicit IBindable(DX11::Graphics &gfx) : m_Graphics(gfx) { }
+
+protected:
+    std::reference_wrapper<DX11::Graphics> m_Graphics;
 };

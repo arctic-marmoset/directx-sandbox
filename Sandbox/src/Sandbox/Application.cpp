@@ -22,8 +22,8 @@ Application::~Application()
 void Application::InitGraphicsResources()
 {
     m_VertexShader = std::make_unique<VertexShader>(*m_Graphics, L"Phong_VS.cso");
-    m_PixelShader = std::make_unique<PixelShader>(*m_Graphics, L"Phong_PS.cso");
-    m_InputLayout = std::make_unique<InputLayout>(*m_Graphics, *m_VertexShader);
+    m_PixelShader  = std::make_unique<PixelShader>(*m_Graphics, L"Phong_PS.cso");
+    m_InputLayout  = std::make_unique<InputLayout>(*m_Graphics, *m_VertexShader);
 
     m_VertexShader->Bind();
     m_PixelShader->Bind();

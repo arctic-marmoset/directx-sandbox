@@ -3,17 +3,16 @@
 #include "Sandbox/Graphics/DX11/Graphics.h"
 #include "Sandbox/Graphics/DX11/VertexShader.h"
 
-InputLayout::InputLayout(const DX11::Graphics &gfx,
+InputLayout::InputLayout(DX11::Graphics &gfx,
                          const VertexShader &vertexShader,
-                         const D3D11_INPUT_ELEMENT_DESC *layoutDesc, 
+                         const D3D11_INPUT_ELEMENT_DESC *layoutDesc,
                          std::size_t layoutDescNumElements)
     :
+    IBindable(gfx),
     m_LayoutDesc(layoutDesc, layoutDesc + layoutDescNumElements)
 {
-    m_Graphics = &gfx;
-
-    const auto device = m_Graphics->GetD3DDevice();
-    const auto byteCode = vertexShader.GetByteCode();
+    auto *device = m_Graphics.get().GetD3DDevice();
+    auto *byteCode = vertexShader.GetByteCode();
 
     // If no layoutDesc was provided, assume basic vertex layout
     if (!layoutDesc)
@@ -25,7 +24,7 @@ InputLayout::InputLayout(const DX11::Graphics &gfx,
         };
 
         device->CreateInputLayout(basicVertexLayoutDesc,
-                                  std::size(basicVertexLayoutDesc),
+                                  ARRAYSIZE(basicVertexLayoutDesc),
                                   byteCode->GetBufferPointer(),
                                   byteCode->GetBufferSize(),
                                   &m_InputLayout);
@@ -42,5 +41,5 @@ InputLayout::InputLayout(const DX11::Graphics &gfx,
 
 void InputLayout::Bind() const
 {
-    m_Graphics->GetD3DContext()->IASetInputLayout(m_InputLayout.Get());
+    m_Graphics.get().GetD3DContext()->IASetInputLayout(m_InputLayout.Get());
 }

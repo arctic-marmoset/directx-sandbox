@@ -5,7 +5,7 @@
 class PixelShader : public IBindable
 {
 public:
-    PixelShader(const DX11::Graphics &gfx, std::wstring fileName);
+    PixelShader(DX11::Graphics &gfx, std::wstring fileName);
     ~PixelShader() = default;
 
     void Bind() const override;
