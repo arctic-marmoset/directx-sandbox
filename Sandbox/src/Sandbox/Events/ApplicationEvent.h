@@ -17,7 +17,7 @@ public:
     int GetWidth() const { return m_Width; }
     int GetHeight() const { return m_Height; }
 
-    virtual std::wstring ToString() const override
+    std::wstring ToString() const override
     {
         std::wostringstream ss;
         ss << L"WindowSizeChangedEvent: (" << m_Width << ", " << m_Height << ")";

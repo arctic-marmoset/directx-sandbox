@@ -29,7 +29,7 @@ class EventDispatcher
     using EventHandler = std::function<bool(T &)>;
 
 public:
-    EventDispatcher(Event &event)
+    explicit EventDispatcher(Event &event)
         :
         m_Event(event)
     {
