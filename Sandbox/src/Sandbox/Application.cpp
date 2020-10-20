@@ -1,13 +1,11 @@
 #include "gspch.h"
 #include "Application.h"
 
-#define BIND_HANDLER_FN(x) std::bind(&x, this, std::placeholders::_1)
-
 Application::Application()
     :
     m_WindowClosed(false)
 {
-    m_Window.SetEventCallback(BIND_HANDLER_FN(Application::OnEvent));
+    m_Window.SetEventCallback([this](auto &e) { this->OnEvent(e); });
     m_Graphics = std::make_unique<DX11::Graphics>();
     m_Graphics->SetWindow(m_Window);
     m_Window.ShowWindow(SW_SHOWDEFAULT);
@@ -46,8 +44,14 @@ void Application::Run()
 void Application::OnEvent(Event &e)
 {
     EventDispatcher dispatcher(e);
-    dispatcher.Dispatch<WindowSizeChangedEvent>(BIND_HANDLER_FN(Application::OnWindowSizeChanged));
-    dispatcher.Dispatch<WindowClosedEvent>(BIND_HANDLER_FN(Application::OnWindowClosed));
+    dispatcher.Dispatch<WindowSizeChangedEvent>([this](auto &event)
+    {
+        return this->OnWindowSizeChanged(event);
+    });
+    dispatcher.Dispatch<WindowClosedEvent>([this](auto &event)
+    {
+        return this->OnWindowClosed(event);
+    });
 }
 
 bool Application::OnWindowSizeChanged(WindowSizeChangedEvent &e)

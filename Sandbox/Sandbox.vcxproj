@@ -128,19 +128,10 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="src\Sandbox\Graphics\DX11\Graphics.h" />
-    <ClInclude Include="src\Sandbox\Graphics\DX11\IBindable.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="src\Sandbox\Graphics\DX11\InputLayout.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
+    <ClInclude Include="src\Sandbox\Graphics\DX11\IBindable.h" />
+    <ClInclude Include="src\Sandbox\Graphics\DX11\InputLayout.h" />
     <ClInclude Include="src\Sandbox\Graphics\DX11\PixelShader.h" />
-    <ClInclude Include="src\Sandbox\Graphics\DX11\VertexShader.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
+    <ClInclude Include="src\Sandbox\Graphics\DX11\VertexShader.h" />
     <ClInclude Include="src\Sandbox\Window.h" />
   </ItemGroup>
   <ItemGroup>
