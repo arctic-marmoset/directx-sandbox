@@ -61,10 +61,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>gspch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>src;</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -84,10 +84,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>gspch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>src;</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -102,7 +102,10 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\gspch.cpp" />
+    <ClCompile Include="src\gspch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\Sandbox.cpp" />
     <ClCompile Include="src\Sandbox\Application.cpp" />
     <ClCompile Include="src\Sandbox\Clock.cpp" />
@@ -114,19 +117,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gspch.h" />
-    <ClInclude Include="src\Sandbox\Application.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
+    <ClInclude Include="src\Sandbox\Application.h" />
     <ClInclude Include="src\Sandbox\Clock.h" />
-    <ClInclude Include="src\Sandbox\Events\ApplicationEvent.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="src\Sandbox\Events\Event.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
+    <ClInclude Include="src\Sandbox\Events\ApplicationEvent.h" />
+    <ClInclude Include="src\Sandbox\Events\Event.h" />
     <ClInclude Include="src\Sandbox\Graphics\DX11\Graphics.h" />
     <ClInclude Include="src\Sandbox\Graphics\DX11\IBindable.h" />
     <ClInclude Include="src\Sandbox\Graphics\DX11\InputLayout.h" />
