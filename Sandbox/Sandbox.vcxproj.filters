@@ -18,7 +18,7 @@
     <ClCompile Include="src\Sandbox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gspch.cpp">
+    <ClCompile Include="src\gsspch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Sandbox\Window.cpp">
@@ -44,37 +44,31 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\gspch.h">
+    <ClInclude Include="src\gsspch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sandbox\Window.h">
+    <ClInclude Include="src\Sandbox\Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sandbox\Clock.h">
+    <ClInclude Include="src\Sandbox\Clock.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sandbox\Application.h">
+    <ClInclude Include="src\Sandbox\Application.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sandbox\Events\Event.h">
+    <ClInclude Include="src\Sandbox\Graphics\DX11\Graphics.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sandbox\Graphics\DX11\Graphics.h">
+    <ClInclude Include="src\Sandbox\Graphics\DX11\IBindable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sandbox\Events\ApplicationEvent.h">
+    <ClInclude Include="src\Sandbox\Graphics\DX11\PixelShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sandbox\Graphics\DX11\IBindable.h">
+    <ClInclude Include="src\Sandbox\Graphics\DX11\VertexShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sandbox\Graphics\DX11\PixelShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sandbox\Graphics\DX11\VertexShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sandbox\Graphics\DX11\InputLayout.h">
+    <ClInclude Include="src\Sandbox\Graphics\DX11\InputLayout.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

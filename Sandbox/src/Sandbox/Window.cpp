@@ -1,50 +1,58 @@
-#include "gspch.h"
-#include "Window.h"
-#include "Sandbox/Events/ApplicationEvent.h"
+#include "gsspch.hpp"
+#include "Window.hpp"
 
-Window::Window(const Properties &props) 
+Window::Window(WORD width, WORD height, std::wstring title)
     :
-    m_Data(props)
+    m_Width(width),
+    m_Height(height),
+    m_Title(std::move(title))
 {
-    // Get bounding rect dimensions based on desired client dimensions
-    RECT wr = { 0, 0, m_Data.Width, m_Data.Height };
-    ::AdjustWindowRect(&wr, WindowTraits::GetWndStyle(0), FALSE);
-    wr = { 0, 0, wr.right - wr.left, wr.bottom - wr.top };
+    RECT wr = {
+        .left   = 0,
+        .top    = 0,
+        .right  = m_Width,
+        .bottom = m_Height,
+    };
 
-    Create(nullptr, &wr, m_Data.Title.c_str());
+    AdjustWindowRectEx(&wr, GetWndStyle(0), FALSE, GetWndExStyle(0));
+
+    wr = {
+        .left   = 0,
+        .top    = 0,
+        .right  = wr.right - wr.left,
+        .bottom = wr.bottom - wr.top,
+    };
+
+    Create(nullptr, &wr, m_Title.c_str());
 }
 
 LRESULT Window::OnResize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
-    const auto width = LOWORD(lParam);
-    const auto height = HIWORD(lParam);
+    const WORD width  = LOWORD(lParam);
+    const WORD height = HIWORD(lParam);
     
-    // Update window properties
-    m_Data.Width = width;
-    m_Data.Height = height;
-
-    // Send event to EventCallback
-    WindowSizeChangedEvent event(width, height);
-    m_Data.EventCallback(event);
+    m_Width  = width;
+    m_Height = height;
     
-    return 1; // Return 1 to signify that WM_SIZE has been handled
+    GetEventDelegate().OnWindowSize(width, height);
+    
+    return 0;
 }
 
-LRESULT Window::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
+LRESULT Window::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    WindowClosedEvent event;
-    m_Data.EventCallback(event);
+    GetEventDelegate().OnWindowClose();
 
-    ::PostQuitMessage(0);
-    return 0; // Return 0 to signify that WM_DESTROY has been handled
+    DestroyWindow();
+    return 0;
 }
 
 void Window::ProcessMessages()
 {
-    MSG msg = { };
+    MSG msg;
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
     {
-        ::TranslateMessage(&msg);
-        ::DispatchMessage(&msg);
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
     }
 }

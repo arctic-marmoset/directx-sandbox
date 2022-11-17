@@ -19,17 +19,14 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -44,7 +41,6 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
     <ExtensionsToDeleteOnClean>*.cso;*.cdf;*.cache;*.obj;*.obj.enc;*.ilk;*.ipdb;*.iobj;*.resources;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;*.tlog;*.manifest;*.res;*.pch;*.exp;*.idb;*.rep;*.xdc;*.pdb;*_manifest.rc;*.bsc;*.sbr;*.xml;*.metagen;*.bi</ExtensionsToDeleteOnClean>
@@ -57,19 +53,19 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>gspch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>gsspch.hpp</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>src;</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3dcompiler.lib;d3d11.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -78,7 +74,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -86,15 +82,15 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>gspch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>src;</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3dcompiler.lib;d3d11.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -102,7 +98,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\gspch.cpp">
+    <ClCompile Include="src\gsspch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -116,17 +112,15 @@
     <ClCompile Include="src\Sandbox\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\gspch.h" />
-    <ClInclude Include="src\Sandbox\Application.h" />
-    <ClInclude Include="src\Sandbox\Clock.h" />
-    <ClInclude Include="src\Sandbox\Events\ApplicationEvent.h" />
-    <ClInclude Include="src\Sandbox\Events\Event.h" />
-    <ClInclude Include="src\Sandbox\Graphics\DX11\Graphics.h" />
-    <ClInclude Include="src\Sandbox\Graphics\DX11\IBindable.h" />
-    <ClInclude Include="src\Sandbox\Graphics\DX11\InputLayout.h" />
-    <ClInclude Include="src\Sandbox\Graphics\DX11\PixelShader.h" />
-    <ClInclude Include="src\Sandbox\Graphics\DX11\VertexShader.h" />
-    <ClInclude Include="src\Sandbox\Window.h" />
+    <ClInclude Include="src\gsspch.hpp" />
+    <ClInclude Include="src\Sandbox\Application.hpp" />
+    <ClInclude Include="src\Sandbox\Clock.hpp" />
+    <ClInclude Include="src\Sandbox\Graphics\DX11\Graphics.hpp" />
+    <ClInclude Include="src\Sandbox\Graphics\DX11\IBindable.hpp" />
+    <ClInclude Include="src\Sandbox\Graphics\DX11\InputLayout.hpp" />
+    <ClInclude Include="src\Sandbox\Graphics\DX11\PixelShader.hpp" />
+    <ClInclude Include="src\Sandbox\Graphics\DX11\VertexShader.hpp" />
+    <ClInclude Include="src\Sandbox\Window.hpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Sandbox\Shaders\Phong_PS.hlsl">

@@ -1,17 +1,20 @@
-#include "gspch.h"
-#include "InputLayout.h"
-#include "Sandbox/Graphics/DX11/Graphics.h"
-#include "Sandbox/Graphics/DX11/VertexShader.h"
+#include "gsspch.hpp"
+#include "InputLayout.hpp"
 
-InputLayout::InputLayout(DX11::Graphics &gfx,
-                         const VertexShader &vertexShader,
-                         const D3D11_INPUT_ELEMENT_DESC *layoutDesc,
-                         std::size_t layoutDescNumElements)
+#include "Sandbox/Graphics/DX11/Graphics.hpp"
+#include "Sandbox/Graphics/DX11/VertexShader.hpp"
+
+InputLayout::InputLayout(
+    DX11::Graphics                 &gfx,
+    const VertexShader             &vertexShader,
+    const D3D11_INPUT_ELEMENT_DESC *layoutDesc,
+    std::size_t                     layoutDescNumElements
+)
     :
     IBindable(gfx),
     m_LayoutDesc(layoutDesc, layoutDesc + layoutDescNumElements)
 {
-    auto *device = m_Graphics.get().GetD3DDevice();
+    auto *device = GetGraphics().GetD3DDevice();
     auto *byteCode = vertexShader.GetByteCode();
 
     // If no layoutDesc was provided, assume basic vertex layout
@@ -23,23 +26,29 @@ InputLayout::InputLayout(DX11::Graphics &gfx,
             { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         };
 
-        device->CreateInputLayout(basicVertexLayoutDesc,
-                                  ARRAYSIZE(basicVertexLayoutDesc),
-                                  byteCode->GetBufferPointer(),
-                                  byteCode->GetBufferSize(),
-                                  &m_InputLayout);
+        static_assert(!(std::size(basicVertexLayoutDesc) > std::numeric_limits<UINT>::max()));
+
+        device->CreateInputLayout(
+            basicVertexLayoutDesc,
+            static_cast<UINT>(std::size(basicVertexLayoutDesc)),
+            byteCode->GetBufferPointer(),
+            byteCode->GetBufferSize(),
+            &m_InputLayout
+        );
     }
     else
     {
-        device->CreateInputLayout(m_LayoutDesc.data(),
-                                  m_LayoutDesc.size(),
-                                  byteCode->GetBufferPointer(),
-                                  byteCode->GetBufferSize(),
-                                  &m_InputLayout);
+        device->CreateInputLayout(
+            m_LayoutDesc.data(),
+            m_LayoutDesc.size(),
+            byteCode->GetBufferPointer(),
+            byteCode->GetBufferSize(),
+            &m_InputLayout
+        );
     }
 }
 
 void InputLayout::Bind() const
 {
-    m_Graphics.get().GetD3DContext()->IASetInputLayout(m_InputLayout.Get());
+    GetGraphics().GetD3DContext()->IASetInputLayout(m_InputLayout.Get());
 }

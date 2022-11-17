@@ -1,18 +1,11 @@
-#include "gspch.h"
-#include "Clock.h"
+#include "gsspch.hpp"
+#include "Clock.hpp"
 
 Clock::Clock()
-    :
-    m_Running(true),
-    m_StartTime(0),
-    m_CurrentTime(0),
-    m_PreviousTime(0),
-    m_SecondsPerTick(0.0),
-    m_Delta(0.0)
 {
-    LARGE_INTEGER freq = { };
+    LARGE_INTEGER freq{ };
     QueryPerformanceFrequency(&freq);
-    m_SecondsPerTick = 1.0f / freq.QuadPart;
+    m_SecondsPerTick = 1.0f / static_cast<float>(freq.QuadPart);
 }
 
 void Clock::Start()
@@ -22,7 +15,7 @@ void Clock::Start()
         return;
     }
 
-    LARGE_INTEGER now = { };
+    LARGE_INTEGER now{ };
     QueryPerformanceCounter(&now);
     m_PreviousTime = now.QuadPart;
     m_Running = true;
@@ -40,7 +33,7 @@ void Clock::Stop()
 
 void Clock::Set()
 {
-    LARGE_INTEGER now = { };
+    LARGE_INTEGER now{ };
     QueryPerformanceCounter(&now);
     m_StartTime = now.QuadPart;
     m_PreviousTime = now.QuadPart;
@@ -55,10 +48,10 @@ void Clock::Tick()
         return;
     }
 
-    LARGE_INTEGER now = { };
+    LARGE_INTEGER now{ };
     QueryPerformanceCounter(&now);
     m_CurrentTime = now.QuadPart;
-    m_Delta = (m_CurrentTime - m_PreviousTime) * m_SecondsPerTick;
+    m_Delta = static_cast<float>(m_CurrentTime - m_PreviousTime) * m_SecondsPerTick;
     m_PreviousTime = m_CurrentTime;
 
     if (m_Delta < 0.0) m_Delta = 0.0;
@@ -66,7 +59,7 @@ void Clock::Tick()
 
 float Clock::TimeTotal() const
 {
-    return (m_CurrentTime - m_StartTime) * m_SecondsPerTick;
+    return static_cast<float>(m_CurrentTime - m_StartTime) * m_SecondsPerTick;
 }
 
 float Clock::TimeDelta() const
