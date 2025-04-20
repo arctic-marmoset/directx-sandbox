@@ -28,6 +28,7 @@ namespace DX11
     private:
         void InitDeviceResources();
         void InitDimensionDependentResources();
+        void InitResources();
 
     private:
         HWND m_WindowHandle;
@@ -39,6 +40,9 @@ namespace DX11
         Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
         Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
         D3D11_VIEWPORT                                 m_RenderViewport;
+
+        Microsoft::WRL::ComPtr<ID3D11Buffer> m_VertexBuffer;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> m_ConstantBuffer;
 
         D3D_FEATURE_LEVEL m_FeatureLevel;
 

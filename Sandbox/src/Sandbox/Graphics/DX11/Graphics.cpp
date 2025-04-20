@@ -4,9 +4,66 @@
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
+struct VERTEX3D
+{
+    dx::XMFLOAT3 Pos;
+    dx::XMFLOAT3 Color;
+};
+
+// TODO: Stop hard-coding geometries
+constexpr VERTEX3D cube[] =
+{
+    { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //0
+    { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //4
+    { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //1
+
+    { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //5
+    { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //1
+    { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //4
+
+    { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //0
+    { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //1
+    { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //2
+
+    { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //3
+    { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //2
+    { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //1
+
+    { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //0
+    { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //2
+    { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //4
+
+    { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //6
+    { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //4
+    { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //2
+
+    { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //1
+    { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //5
+    { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //3
+
+    { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //7
+    { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //3
+    { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //5
+
+    { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //3
+    { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //7
+    { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //2
+
+    { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //6
+    { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //2
+    { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //7
+
+    { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //4
+    { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //6
+    { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //5
+
+    { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //7
+    { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //5
+    { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //6
+};
+
 namespace DX11
 {
-
     Graphics::Graphics()
         :
         m_WindowHandle(nullptr),
@@ -15,6 +72,7 @@ namespace DX11
         m_SyncInterval(0)
     {
         InitDeviceResources();
+        InitResources();
     }
 
     Graphics::~Graphics()
@@ -173,89 +231,8 @@ namespace DX11
         m_Context->RSSetViewports(1, &m_RenderViewport);
     }
 
-    void Graphics::Clear(float red, float green, float blue)
+    void Graphics::InitResources()
     {
-        const float color[] = { red, green, blue, 1.0f };
-        m_Context->ClearRenderTargetView(m_RenderTargetView.Get(), color);
-        m_Context->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-    }
-
-    void Graphics::BeginFrame()
-    {
-        m_Context->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
-    }
-
-    void Graphics::EndFrame()
-    {
-        HRESULT hr = m_SwapChain->Present(m_SyncInterval, 0);
-        if (FAILED(hr))
-        {
-            // TODO: Handle error
-        }
-    }
-
-    void Graphics::DrawCube(float step)
-    {
-        // Define vertex resources
-
-        struct VERTEX3D
-        {
-            dx::XMFLOAT3 Pos;
-            dx::XMFLOAT3 Color;
-        };
-
-        // TODO: Stop hard-coding geometries
-        VERTEX3D cube[] =
-        {
-            { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //0
-            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //4
-            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //1
-                                                                             
-            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //5
-            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //1
-            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  1.0f,  0.0f) }, //4
-                                                                      
-            { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //0
-            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //1
-            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //2
-                                                                      
-            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //3
-            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //2
-            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 0.0f,  0.0f, -1.0f) }, //1
-                                                                      
-            { dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //0
-            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //2
-            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //4
-                                                                             
-            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //6
-            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //4
-            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3(-1.0f,  0.0f,  0.0f) }, //2
-
-            { dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //1
-            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //5
-            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //3
-
-            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //7
-            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //3
-            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 1.0f,  0.0f,  0.0f) }, //5
-
-            { dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //3
-            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //7
-            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //2
-
-            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //6
-            { dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //2
-            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f, -1.0f,  0.0f) }, //7
-
-            { dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //4
-            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //6
-            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //5
-
-            { dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //7
-            { dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //5
-            { dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3( 0.0f,  0.0f,  1.0f) }, //6
-        };
-
         // Initialise Vertex Buffer
 
         D3D11_BUFFER_DESC vbd = { };
@@ -267,8 +244,7 @@ namespace DX11
         D3D11_SUBRESOURCE_DATA vsrd = { };
         vsrd.pSysMem = cube;
 
-        wrl::ComPtr<ID3D11Buffer> vertexBuffer;
-        m_Device->CreateBuffer(&vbd, &vsrd, &vertexBuffer);
+        m_Device->CreateBuffer(&vbd, &vsrd, &m_VertexBuffer);
 
         // Bind Vertex Buffer to IA stage
 
@@ -277,7 +253,7 @@ namespace DX11
 
         m_Context->IASetVertexBuffers(0,
                                       1,
-                                      vertexBuffer.GetAddressOf(),
+                                      m_VertexBuffer.GetAddressOf(),
                                       &stride,
                                       &offset);
 
@@ -326,9 +302,7 @@ namespace DX11
         D3D11_VIEWPORT vp = { };
         m_Context->RSGetViewports(&vpCount, &vp);
 
-        dx::XMMATRIX model = dx::XMMatrixRotationX(step / 4.0f) *
-                             dx::XMMatrixRotationY(step) *
-                             dx::XMMatrixTranslation(0.0f, 0.0f, 5.0f);
+        dx::XMMATRIX model = dx::XMMatrixTranslation(0.0f, 0.0f, 5.0f);
 
         const ConstBuffer cb =
         {
@@ -349,21 +323,36 @@ namespace DX11
         D3D11_SUBRESOURCE_DATA csrd = { };
         csrd.pSysMem = &cb;
 
-        wrl::ComPtr<ID3D11Buffer> constantBuffer;
-        m_Device->CreateBuffer(&cbd, &csrd, &constantBuffer);
+        m_Device->CreateBuffer(&cbd, &csrd, &m_ConstantBuffer);
 
         // Bind Constant Buffer to VS stage
-
-        m_Context->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
-
-        // Describe topology
-
-        m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-        // Finally
-
-        //m_Context->DrawIndexed(static_cast<UINT>(std::size(indices)), 0, 0);
-        m_Context->Draw(static_cast<UINT>(std::size(cube)), 0);
+        m_Context->VSSetConstantBuffers(0, 1, m_ConstantBuffer.GetAddressOf());
     }
 
+    void Graphics::Clear(float red, float green, float blue)
+    {
+        const float color[] = { red, green, blue, 1.0f };
+        m_Context->ClearRenderTargetView(m_RenderTargetView.Get(), color);
+        m_Context->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+    }
+
+    void Graphics::BeginFrame()
+    {
+        m_Context->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+    }
+
+    void Graphics::EndFrame()
+    {
+        HRESULT hr = m_SwapChain->Present(m_SyncInterval, 0);
+        if (FAILED(hr))
+        {
+            // TODO: Handle error
+        }
+    }
+
+    void Graphics::DrawCube(float step)
+    {
+        m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_Context->Draw(static_cast<UINT>(std::size(cube)), 0);
+    }
 }
