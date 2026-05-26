@@ -1,11 +1,8 @@
 #include "gspch.h"
 #include "Sandbox/Application.h"
 
-int wmain(int argc, wchar_t *argv[])
+int wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-#ifdef NDEBUG
-    FreeConsole();
-#endif
     Application app;
     app.Run();
 }
